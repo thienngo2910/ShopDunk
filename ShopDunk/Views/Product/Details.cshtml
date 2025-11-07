@@ -1,0 +1,16 @@
+﻿@model ShopDunk.Models.Product
+@{
+    ViewBag.Title = "Chi tiết sản phẩm";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <img src="@Model.ImageUrl" class="img-fluid" />
+    </div>
+    <div class="col-md-6">
+        <h2>@Model.Name</h2>
+        <p class="text-danger fw-bold fs-4">@Model.Price.ToString("C")</p>
+        <p>@Model.Description</p>
+        <a href="/Cart/Add/@Model.ProductID" class="btn btn-primary">Thêm vào giỏ</a>
+    </div>
+</div>

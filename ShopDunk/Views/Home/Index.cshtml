@@ -1,0 +1,25 @@
+﻿@model IEnumerable<ShopDunk.Models.Product>
+@{
+    ViewBag.Title = "Trang chủ";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-5 fw-bold">Chào mừng đến với ShopDunk</h1>
+    <p class="lead">Khám phá các sản phẩm Apple chính hãng</p>
+</div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
+                <div class="card-body text-center">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="text-danger fw-bold">@item.Price.ToString("C")</p>
+                    <a href="/Product/Details/@item.ProductID" class="btn btn-outline-primary w-100">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

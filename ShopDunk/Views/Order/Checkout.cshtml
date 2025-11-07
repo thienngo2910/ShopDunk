@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ShopDunk.Models.CartItem>
+@{
+    ViewBag.Title = "Thanh toán";
+}
+
+<h2>Xác nhận đơn hàng</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@(item.Product.Price * item.Quantity).ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form method="post" action="/Order/PlaceOrder">
+    <button type="submit" class="btn btn-success">Xác nhận đặt hàng</button>
+</form>
