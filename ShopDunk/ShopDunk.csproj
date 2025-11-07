@@ -135,6 +135,15 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511070715548_InitialCreate.cs" />
+    <Compile Include="Migrations\202511070715548_InitialCreate.Designer.cs">
+      <DependentUpon>202511070715548_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511070736124_UpdateModel.cs" />
+    <Compile Include="Migrations\202511070736124_UpdateModel.Designer.cs">
+      <DependentUpon>202511070736124_UpdateModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
     <Compile Include="Models\Order.cs" />
@@ -201,8 +210,16 @@
     <Content Include="Views\Product\Details.cshtml" />
     <Content Include="Views\Cart\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
+      <DependentUpon>202511070715548_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511070736124_UpdateModel.resx">
+      <DependentUpon>202511070736124_UpdateModel.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
     <Content Include="Content\bootstrap.rtl.css.map" />

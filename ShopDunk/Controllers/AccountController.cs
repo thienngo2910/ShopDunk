@@ -28,4 +28,34 @@ public class AccountController : Controller
         Session.Clear();
         return RedirectToAction("Login");
     }
+    public ActionResult Register()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public ActionResult Register(User user)
+    {
+        if (ModelState.IsValid)
+        {
+            using (var db = new AppDbContext())
+            {
+                var existing = db.Users.FirstOrDefault(u => u.Username == user.Username);
+                if (existing != null)
+                {
+                    ViewBag.Error = "Tên đăng nhập đã tồn tại.";
+                    return View();
+                }
+
+                // Lưu ý: nên mã hóa mật khẩu trước khi lưu
+                db.Users.Add(user);
+                db.SaveChanges();
+
+                TempData["Success"] = "Đăng ký thành công. Vui lòng đăng nhập.";
+                return RedirectToAction("Login");
+            }
+        }
+
+        return View();
+    }
 }

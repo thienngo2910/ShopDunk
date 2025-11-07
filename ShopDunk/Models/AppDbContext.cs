@@ -1,6 +1,5 @@
-﻿using ShopDunk.Models;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
+using ShopDunk.Models; // hoặc đúng namespace của các model như Product, User...
 
 namespace ShopDunk.Models
 {

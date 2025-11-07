@@ -1,20 +1,138 @@
-﻿/* Set padding to keep content from hitting the edges */
-.body-content {
-    margin-top: 15px;
-    padding-left: 15px;
-    padding-right: 15px;
+﻿/* Reset & base */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+    margin: 0;
+    padding: 0;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+/* Navbar */
+.navbar {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0071e3 !important;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: #333;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: #0071e3;
+    }
+
+/* Product Cards */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.card-body p {
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #0071e3;
+    border-color: #0071e3;
+}
+
+    .btn-primary:hover {
+        background-color: #005bb5;
+        border-color: #005bb5;
+    }
+
+.btn-outline-primary {
+    color: #0071e3;
+    border-color: #0071e3;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #0071e3;
+        color: #fff;
+    }
+
+/* Footer */
+footer {
+    background-color: #212529;
+    color: #fff;
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
+
+    footer a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+        footer a:hover {
+            color: #0071e3;
+        }
+
+/* Forms */
+form label {
+    font-weight: 500;
+}
+
+form .form-control {
+    border-radius: 0.25rem;
+}
+
+/* Table */
+.table th {
+    background-color: #f1f1f1;
+    font-weight: 600;
+}
+
+/* Alerts */
+.alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+}
+/* Responsive navbar */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .navbar-nav {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .card-title {
+        font-size: 0.95rem;
+    }
+
+    .card-body p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsive product grid */
+@media (max-width: 576px) {
+    .row > .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 }

@@ -1,16 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopDunk.Models
+public class User
 {
-    public class User
-    {
-        public int UserID { get; set; }
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
-    }
+    [Key]
+    public int UserID { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
+    public string Username { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+
+    [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
+    [DataType(DataType.Password)]
+    public string ConfirmPassword { get; set; }
+
+    public string PasswordHash { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng nhập email")]
+    [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+    public string Email { get; set; }
+
+    public string Role { get; set; } = "User";
 }
