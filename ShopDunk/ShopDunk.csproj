@@ -143,6 +143,10 @@
     <Compile Include="Migrations\202511070736124_UpdateModel.Designer.cs">
       <DependentUpon>202511070736124_UpdateModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511080506098_AddCategoryToProduct.cs" />
+    <Compile Include="Migrations\202511080506098_AddCategoryToProduct.Designer.cs">
+      <DependentUpon>202511080506098_AddCategoryToProduct.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
@@ -219,6 +223,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202511070736124_UpdateModel.resx">
       <DependentUpon>202511070736124_UpdateModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511080506098_AddCategoryToProduct.resx">
+      <DependentUpon>202511080506098_AddCategoryToProduct.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
