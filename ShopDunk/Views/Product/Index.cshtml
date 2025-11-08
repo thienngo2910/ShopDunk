@@ -1,19 +1,54 @@
-﻿@model IEnumerable<ShopDunk.Models.Product>
-@{
+﻿@{
     ViewBag.Title = "Sản phẩm";
 }
 
-<h2 class="mb-4">Tất cả sản phẩm</h2>
-
+<!-- iPhone -->
+<h2 class="mb-4">iPhone</h2>
 <div class="row">
-    @foreach (var item in Model)
+    @foreach (var item in ViewBag.iPhones as List<ShopDunk.Models.Product>)
     {
         <div class="col-md-3 mb-4">
             <div class="card border-0 shadow-sm">
                 <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
                 <div class="card-body text-center">
                     <h5 class="card-title">@item.Name</h5>
-                    <p class="text-danger fw-bold">@item.Price.ToString("C")</p>
+                    <p class="text-danger fw-bold">@item.Price.ToString("N0") ₫</p>
+                    <a href="/Cart/Add/@item.ProductID" class="btn btn-primary w-100">Thêm vào giỏ</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- iPad -->
+<h2 class="mb-4">iPad</h2>
+<div class="row">
+    @foreach (var item in ViewBag.iPads as List<ShopDunk.Models.Product>)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
+                <div class="card-body text-center">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="text-danger fw-bold">@item.Price.ToString("N0") ₫</p>
+                    <a href="/Cart/Add/@item.ProductID" class="btn btn-primary w-100">Thêm vào giỏ</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Mac -->
+<h2 class="mb-4">Mac</h2>
+<div class="row">
+    @foreach (var item in ViewBag.Macs as List<ShopDunk.Models.Product>)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
+                <div class="card-body text-center">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="text-danger fw-bold">@item.Price.ToString("N0") ₫</p>
                     <a href="/Cart/Add/@item.ProductID" class="btn btn-primary w-100">Thêm vào giỏ</a>
                 </div>
             </div>

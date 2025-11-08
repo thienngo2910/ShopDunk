@@ -1,0 +1,16 @@
+﻿@model ShopDunk.Models.Product
+@{
+    ViewBag.Title = "Xóa sản phẩm";
+}
+
+<h3>Bạn có chắc muốn xóa sản phẩm này?</h3>
+<div>
+    <strong>@Model.Name</strong> - @Model.Price.ToString("N0") ₫
+</div>
+
+@using (Html.BeginForm("DeleteConfirmed", "Product", new { id = Model.ProductID }))
+{
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger mt-3">Xóa</button>
+    <a href="/Product/Index" class="btn btn-secondary mt-3">Hủy</a>
+}
