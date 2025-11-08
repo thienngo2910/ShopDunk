@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ShopDunk.Models;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using ShopDunk.Models;
 
-namespace ShopDunk.Controllers
+public class HomeController : Controller
 {
-    public class HomeController : Controller
-    {
-        private AppDbContext db = new AppDbContext();
+    private AppDbContext db = new AppDbContext();
 
-        public ActionResult Index()
-        {
-            var featured = db.Products.OrderByDescending(p => p.ProductID).Take(4).ToList();
-            return View(featured);
-        }
+    public ActionResult Index()
+    {
+        ViewBag.iPhones = db.Products.Where(p => p.Category == "iPhone").Take(4).ToList();
+        ViewBag.iPads = db.Products.Where(p => p.Category == "iPad").Take(4).ToList();
+        ViewBag.Macs = db.Products.Where(p => p.Category == "Mac").Take(4).ToList();
+        return View();
     }
 }

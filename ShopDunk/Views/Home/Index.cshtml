@@ -32,18 +32,29 @@
     </button>
 </div>
 
-<div class="row">
-    @foreach (var item in Model)
+<!-- iPhone -->
+<h2 class="mb-4 fw-bold text-dark">iPhone</h2>
+<div class="row row-cols-2 row-cols-md-4 g-4 mb-5">
+    @foreach (var product in ViewBag.iPhones as List<ShopDunk.Models.Product>)
     {
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name">
-                <div class="card-body text-center">
-                    <h5 class="card-title">@item.Name</h5>
-                    <p class="text-danger fw-bold">@item.Price.ToString("C")</p>
-                    <a href="/Product/Details/@item.ProductID" class="btn btn-outline-primary w-100">Xem chi tiết</a>
-                </div>
-            </div>
-        </div>
+        @Html.Partial("_ProductCard", product)
+    }
+</div>
+
+<!-- iPad -->
+<h2 class="mb-4 fw-bold text-dark">iPad</h2>
+<div class="row row-cols-2 row-cols-md-4 g-4 mb-5">
+    @foreach (var product in ViewBag.iPads as List<ShopDunk.Models.Product>)
+    {
+        @Html.Partial("_ProductCard", product)
+    }
+</div>
+
+<!-- Mac -->
+<h2 class="mb-4 fw-bold text-dark">Mac</h2>
+<div class="row row-cols-2 row-cols-md-4 g-4 mb-5">
+    @foreach (var product in ViewBag.Macs as List<ShopDunk.Models.Product>)
+    {
+        @Html.Partial("_ProductCard", product)
     }
 </div>
