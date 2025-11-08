@@ -1,0 +1,12 @@
+﻿@model ShopDunk.Models.Product
+
+<div class="col">
+    <div class="card h-100 shadow-sm">
+        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" />
+        <div class="card-body text-center">
+            <h5 class="card-title">@Model.Name</h5>
+            <p class="text-primary fw-bold">@Model.Price.ToString("N0") ₫</p>
+            <a href="/Product/Details/@Model.ProductID" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+        </div>
+    </div>
+</div>
