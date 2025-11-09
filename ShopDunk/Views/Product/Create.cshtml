@@ -1,4 +1,5 @@
 ﻿@model ShopDunk.Models.Product
+@Html.ValidationSummary(true)
 @{
     ViewBag.Title = "Thêm/Sửa sản phẩm";
 }
@@ -24,10 +25,8 @@
 
     <div class="form-group">
         @Html.LabelFor(m => m.ImageFile, "Ảnh sản phẩm")
-        <input type="file" name="ImageFile" class="form-control" />
+        @Html.TextBoxFor(m => m.ImageFile, new { type = "file", @class = "form-control" })
     </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Thêm sản phẩm</button>
 
     <div class="form-group">
         @Html.LabelFor(m => m.Stock)
@@ -39,6 +38,6 @@
         @Html.DropDownListFor(m => m.Category, new SelectList(new[] { "iPhone", "iPad", "Mac" }), "Chọn danh mục", new { @class = "form-control" })
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Lưu sản phẩm</button>
+    <button type="submit" class="btn btn-primary mt-3">Thêm sản phẩm</button>
 }
 

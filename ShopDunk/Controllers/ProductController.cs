@@ -1,4 +1,5 @@
 ﻿using ShopDunk.Models;
+using System;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -44,12 +45,33 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Create(Product product)
     {
-        if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
+        try
         {
-            string fileName = Path.GetFileName(product.ImageFile.FileName);
-            string path = Path.Combine(Server.MapPath("~/images/products"), fileName);
-            product.ImageFile.SaveAs(path);
-            product.ImageUrl = "/images/products/" + fileName;
+            if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
+            {
+                string originalName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
+                string extension = Path.GetExtension(product.ImageFile.FileName);
+
+                // Loại bỏ ký tự đặc biệt
+                string safeName = System.Text.RegularExpressions.Regex.Replace(originalName, @"[^a-zA-Z0-9]", "_");
+
+                // Tạo tên file duy nhất
+                string fileName = safeName + "_" + Guid.NewGuid() + extension;
+
+                string folderPath = Server.MapPath("~/Images/products");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                string fullPath = Path.Combine(folderPath, fileName);
+                product.ImageFile.SaveAs(fullPath);
+                product.ImageUrl = "/Images/products/" + fileName;
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", "Lỗi khi lưu ảnh: " + ex.Message);
         }
 
         if (ModelState.IsValid)
