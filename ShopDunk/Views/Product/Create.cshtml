@@ -3,7 +3,7 @@
     ViewBag.Title = "Thêm/Sửa sản phẩm";
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -23,9 +23,11 @@
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(m => m.ImageUrl)
-        @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control" })
+        @Html.LabelFor(m => m.ImageFile, "Ảnh sản phẩm")
+        <input type="file" name="ImageFile" class="form-control" />
     </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Thêm sản phẩm</button>
 
     <div class="form-group">
         @Html.LabelFor(m => m.Stock)

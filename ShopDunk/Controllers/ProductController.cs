@@ -1,5 +1,6 @@
 ﻿using ShopDunk.Models;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -10,10 +11,8 @@ public class ProductController : Controller
     // Hiển thị sản phẩm chia theo danh mục
     public ActionResult Index()
     {
-        ViewBag.iPhones = db.Products.Where(p => p.Category == "iPhone").Take(4).ToList();
-        ViewBag.iPads = db.Products.Where(p => p.Category == "iPad").Take(4).ToList();
-        ViewBag.Macs = db.Products.Where(p => p.Category == "Mac").Take(4).ToList();
-        return View();
+        var products = db.Products.ToList(); 
+        return View(products);               
     }
 
     // Hiển thị chi tiết sản phẩm
@@ -45,12 +44,21 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Create(Product product)
     {
+        if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
+        {
+            string fileName = Path.GetFileName(product.ImageFile.FileName);
+            string path = Path.Combine(Server.MapPath("~/images/products"), fileName);
+            product.ImageFile.SaveAs(path);
+            product.ImageUrl = "/images/products/" + fileName;
+        }
+
         if (ModelState.IsValid)
         {
             db.Products.Add(product);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+
         return View(product);
     }
 
