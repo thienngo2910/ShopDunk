@@ -9,14 +9,12 @@ public class ProductController : Controller
 {
     private AppDbContext db = new AppDbContext();
 
-    // Hiển thị sản phẩm chia theo danh mục
     public ActionResult Index()
     {
-        var products = db.Products.ToList(); 
-        return View(products);               
+        var products = db.Products.ToList();
+        return View(products);
     }
 
-    // Hiển thị chi tiết sản phẩm
     public ActionResult Details(int id)
     {
         var product = db.Products.Find(id);
@@ -24,7 +22,6 @@ public class ProductController : Controller
         return View(product);
     }
 
-    // Hiển thị sản phẩm theo danh mục
     public ActionResult Category(string name)
     {
         var products = db.Products
@@ -35,7 +32,6 @@ public class ProductController : Controller
         return View(products);
     }
 
-    // Hiển thị form thêm sản phẩm
     public ActionResult Create()
     {
         return View();
@@ -78,13 +74,13 @@ public class ProductController : Controller
         {
             db.Products.Add(product);
             db.SaveChanges();
+            TempData["Success"] = "Thêm sản phẩm thành công!";
             return RedirectToAction("Index");
         }
 
         return View(product);
     }
 
-    // Hiển thị form sửa sản phẩm
     public ActionResult Edit(int id)
     {
         var product = db.Products.Find(id);
@@ -98,14 +94,65 @@ public class ProductController : Controller
     {
         if (ModelState.IsValid)
         {
-            db.Entry(product).State = EntityState.Modified;
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            try
+            {
+                // Lấy sản phẩm hiện tại từ database
+                var existingProduct = db.Products.Find(product.ProductID);
+                if (existingProduct == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Xử lý upload ảnh mới (nếu có)
+                if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
+                {
+                    string originalName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
+                    string extension = Path.GetExtension(product.ImageFile.FileName);
+                    string safeName = System.Text.RegularExpressions.Regex.Replace(originalName, @"[^a-zA-Z0-9]", "_");
+                    string fileName = safeName + "_" + Guid.NewGuid() + extension;
+
+                    string folderPath = Server.MapPath("~/Images/products");
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    string fullPath = Path.Combine(folderPath, fileName);
+                    product.ImageFile.SaveAs(fullPath);
+
+                    // Xóa ảnh cũ (nếu có)
+                    if (!string.IsNullOrEmpty(existingProduct.ImageUrl))
+                    {
+                        string oldImagePath = Server.MapPath(existingProduct.ImageUrl);
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    existingProduct.ImageUrl = "/Images/products/" + fileName;
+                }
+
+                // Cập nhật các trường khác
+                existingProduct.Name = product.Name;
+                existingProduct.Description = product.Description;
+                existingProduct.Price = product.Price;
+                existingProduct.Stock = product.Stock;
+                existingProduct.Category = product.Category;
+
+                db.SaveChanges();
+                TempData["Success"] = "Cập nhật sản phẩm thành công!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message);
+            }
         }
+
         return View(product);
     }
 
-    // Hiển thị xác nhận xóa
     public ActionResult Delete(int id)
     {
         var product = db.Products.Find(id);
@@ -118,8 +165,31 @@ public class ProductController : Controller
     public ActionResult DeleteConfirmed(int id)
     {
         var product = db.Products.Find(id);
-        db.Products.Remove(product);
-        db.SaveChanges();
+        if (product != null)
+        {
+            // Xóa ảnh (nếu có)
+            if (!string.IsNullOrEmpty(product.ImageUrl))
+            {
+                string imagePath = Server.MapPath(product.ImageUrl);
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            db.Products.Remove(product);
+            db.SaveChanges();
+            TempData["Success"] = "Xóa sản phẩm thành công!";
+        }
         return RedirectToAction("Index");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            db.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }
