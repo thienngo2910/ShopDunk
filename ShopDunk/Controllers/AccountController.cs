@@ -15,7 +15,9 @@ public class AccountController : Controller
     [HttpPost]
     public ActionResult Login(string username, string password)
     {
+        username = username.Trim();
         string hash = HashPassword(password);
+
         var user = db.Users.FirstOrDefault(u => u.Username == username && u.PasswordHash == hash);
 
         if (user != null)
@@ -26,7 +28,7 @@ public class AccountController : Controller
             Session["Role"] = user.Role;
             return RedirectToAction("Index", "Home");
         }
-        System.Diagnostics.Debug.WriteLine("Hash nhập vào: " + hash);
+
         ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
         return View();
     }
@@ -41,22 +43,25 @@ public class AccountController : Controller
     public ActionResult Register() => View();
 
     [HttpPost]
-    public ActionResult Register(User user)
+    [ValidateAntiForgeryToken]
+    public ActionResult Register(RegisterViewModel model)
     {
         if (ModelState.IsValid)
         {
-            var existing = db.Users.FirstOrDefault(u => u.Username == user.Username);
+            var existing = db.Users.FirstOrDefault(u => u.Username == model.Username);
             if (existing != null)
             {
                 ViewBag.Error = "Tên đăng nhập đã tồn tại.";
-                return View();
+                return View(model);
             }
 
-            user.PasswordHash = HashPassword(user.Password);
-
-            // Nếu đăng ký tài khoản tên "admin", gán quyền Admin
-            if (user.Username.ToLower() == "admin")
-                user.Role = "Admin";
+            var user = new User
+            {
+                Username = model.Username.Trim(),
+                Email = model.Email,
+                PasswordHash = HashPassword(model.Password),
+                Role = model.Username.Equals("admin", StringComparison.OrdinalIgnoreCase) ? "Admin" : "User"
+            };
 
             db.Users.Add(user);
             db.SaveChanges();
@@ -65,10 +70,51 @@ public class AccountController : Controller
             return RedirectToAction("Login");
         }
 
-        return View(user);
+        return View(model);
     }
 
     public ActionResult AccessDenied() => View();
+
+    public ActionResult ChangePassword()
+    {
+        if (Session["UserID"] == null)
+        {
+            return RedirectToAction("Login");
+        }
+
+        var vm = new ChangePasswordViewModel { UserID = (int)Session["UserID"] };
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult ChangePassword(ChangePasswordViewModel model)
+    {
+        if (Session["UserID"] == null)
+        {
+            return RedirectToAction("Login");
+        }
+
+        int currentUserId = (int)Session["UserID"];
+        if (model.UserID != currentUserId)
+        {
+            return RedirectToAction("AccessDenied");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var user = db.Users.Find(model.UserID);
+        if (user == null) return HttpNotFound();
+
+        user.PasswordHash = HashPassword(model.NewPassword);
+        db.SaveChanges();
+
+        TempData["Success"] = "Đổi mật khẩu thành công.";
+        return RedirectToAction("Index", "Home");
+    }
 
     private string HashPassword(string password)
     {

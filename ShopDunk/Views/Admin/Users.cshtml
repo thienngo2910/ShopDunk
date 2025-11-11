@@ -1,0 +1,83 @@
+@model IEnumerable<ShopDunk.Models.User>
+@{
+ ViewBag.Title = "Qu?n lý ng??i dùng";
+ int page = ViewBag.Page ??1;
+ int pageSize = ViewBag.PageSize ??10;
+ int total = ViewBag.Total ??0;
+ string q = ViewBag.Query ?? "";
+ int totalPages = (int)System.Math.Ceiling((double)total / pageSize);
+}
+
+<h2>Qu?n lý ng??i dùng</h2>
+
+<p>
+ <a class="btn btn-secondary" href="@Url.Action("Index", "Admin")">Tr? v?</a>
+</p>
+
+<form method="get" class="form-inline mb-3">
+ <input type="text" name="q" value="@q" class="form-control mr-2" placeholder="Tìm username ho?c email" />
+ <button type="submit" class="btn btn-primary">Tìm</button>
+</form>
+
+@if (TempData["Success"] != null)
+{
+ <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+ <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table">
+ <thead>
+ <tr>
+ <th>Username</th>
+ <th>Email</th>
+ <th>Role</th>
+ <th>Hành ??ng</th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var u in Model)
+ {
+ <tr>
+ <td>
+ @if (u.Role == "Admin")
+ {
+ <a href='@Url.Action("Index", "Admin")'>@u.Username</a>
+ }
+ else
+ {
+ <a href='@Url.Action("EditUser", "Admin", new { id = u.UserID })'>@u.Username</a>
+ }
+ </td>
+ <td>@u.Email</td>
+ <td>@u.Role</td>
+ <td>
+ <a class="btn btn-sm btn-primary" href="@Url.Action("EditUser", "Admin", new { id = u.UserID })">S?a</a>
+ <a class="btn btn-sm btn-warning" href="@Url.Action("ChangePassword", "Admin", new { id = u.UserID })">??i m?t kh?u</a>
+ @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post, new { @class = "d-inline" }))
+ {
+ @Html.AntiForgeryToken()
+ @Html.Hidden("id", u.UserID)
+ <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('B?n có ch?c mu?n xóa ng??i dùng này?');">Xóa</button>
+ }
+ </td>
+ </tr>
+ }
+ </tbody>
+</table>
+
+@if (totalPages >1)
+{
+ <nav>
+ <ul class="pagination">
+ @for (int i =1; i <= totalPages; i++)
+ {
+ <li class="page-item @(i == page ? "active" : "")">
+ <a class="page-link" href="@Url.Action("Users", "Admin", new { q = q, page = i, pageSize = pageSize })">@i</a>
+ </li>
+ }
+ </ul>
+ </nav>
+}

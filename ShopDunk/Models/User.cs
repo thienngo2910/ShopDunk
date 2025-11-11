@@ -20,7 +20,7 @@ namespace ShopDunk.Models
         public string PasswordHash { get; set; }
 
         [Required]
-        public string Role { get; set; } = "User"; // Mặc định là User
+        public string Role { get; set; } = "User";
 
         // Không lưu vào DB
         [NotMapped]
