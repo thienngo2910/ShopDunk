@@ -135,6 +135,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Migrations\202511070715548_InitialCreate.cs" />
     <Compile Include="Migrations\202511070715548_InitialCreate.Designer.cs">
       <DependentUpon>202511070715548_InitialCreate.cs</DependentUpon>
@@ -146,6 +147,14 @@
     <Compile Include="Migrations\202511080506098_AddCategoryToProduct.cs" />
     <Compile Include="Migrations\202511080506098_AddCategoryToProduct.Designer.cs">
       <DependentUpon>202511080506098_AddCategoryToProduct.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511100758266_InitialCreate1.cs" />
+    <Compile Include="Migrations\202511100758266_InitialCreate1.Designer.cs">
+      <DependentUpon>202511100758266_InitialCreate1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511110038106_UpdateUserModel.cs" />
+    <Compile Include="Migrations\202511110038106_UpdateUserModel.Designer.cs">
+      <DependentUpon>202511110038106_UpdateUserModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
@@ -180,6 +189,9 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\Banners\banner1.png" />
+    <Content Include="Images\Banners\banner2.png" />
+    <Content Include="Images\Banners\banner3.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -219,6 +231,7 @@
     <Content Include="Views\Product\Create.cshtml" />
     <Content Include="Views\Product\Edit.cshtml" />
     <Content Include="Views\Product\Delete.cshtml" />
+    <Content Include="Views\Account\AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
@@ -229,6 +242,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202511080506098_AddCategoryToProduct.resx">
       <DependentUpon>202511080506098_AddCategoryToProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511100758266_InitialCreate1.resx">
+      <DependentUpon>202511100758266_InitialCreate1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511110038106_UpdateUserModel.resx">
+      <DependentUpon>202511110038106_UpdateUserModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

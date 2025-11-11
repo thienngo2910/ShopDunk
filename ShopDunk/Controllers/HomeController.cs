@@ -1,16 +1,47 @@
-﻿using ShopDunk.Models;
+﻿using System;
 using System.Linq;
 using System.Web.Mvc;
+using ShopDunk.Models;
+using System.Collections.Generic;
 
-public class HomeController : Controller
+namespace ShopDunk.Controllers
 {
-    private AppDbContext db = new AppDbContext();
-
-    public ActionResult Index()
+    public class HomeController : Controller
     {
-        ViewBag.iPhones = db.Products.Where(p => p.Category == "iPhone").Take(4).ToList();
-        ViewBag.iPads = db.Products.Where(p => p.Category == "iPad").Take(4).ToList();
-        ViewBag.Macs = db.Products.Where(p => p.Category == "Mac").Take(4).ToList();
-        return View();
+        private AppDbContext db = new AppDbContext();
+
+        public ActionResult Index()
+        {
+            // Lấy toàn bộ danh sách products làm model cho view (Index.cshtml có @model IEnumerable<ShopDunk.Models.Product>)
+            var products = db.Products.ToList();
+
+            // Chuẩn bị các danh sách theo danh mục (có kiểm tra null và so sánh không phân biệt hoa thường)
+            ViewBag.iPhones = products
+                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("iPhone", StringComparison.OrdinalIgnoreCase))
+                .Take(4)
+                .ToList();
+
+            ViewBag.iPads = products
+                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("iPad", StringComparison.OrdinalIgnoreCase))
+                .Take(4)
+                .ToList();
+
+            ViewBag.Macs = products
+                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("Mac", StringComparison.OrdinalIgnoreCase))
+                .Take(4)
+                .ToList();
+
+            // Trả model về view để khớp với @model trong Views/Home/Index.cshtml
+            return View(products);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }

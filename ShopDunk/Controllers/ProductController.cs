@@ -1,6 +1,6 @@
 ﻿using ShopDunk.Models;
+using ShopDunk.Helpers;
 using System;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
@@ -34,6 +34,10 @@ public class ProductController : Controller
 
     public ActionResult Create()
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         return View();
     }
 
@@ -41,6 +45,10 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Create(Product product)
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         try
         {
             if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
@@ -61,21 +69,34 @@ public class ProductController : Controller
                 }
 
                 string fullPath = Path.Combine(folderPath, fileName);
+
+                // Save file (cần quyền ghi)
                 product.ImageFile.SaveAs(fullPath);
                 product.ImageUrl = "/Images/products/" + fileName;
             }
         }
         catch (Exception ex)
         {
+            // Log chi tiết để kiểm tra (App_Data/logs.txt)
+            Logger.Log("Error saving image in Product/Create: " + ex.ToString());
             ModelState.AddModelError("", "Lỗi khi lưu ảnh: " + ex.Message);
         }
 
         if (ModelState.IsValid)
         {
             db.Products.Add(product);
-            db.SaveChanges();
-            TempData["Success"] = "Thêm sản phẩm thành công!";
-            return RedirectToAction("Index");
+            try
+            {
+                db.SaveChanges();
+                TempData["Success"] = "Thêm sản phẩm thành công!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                // Ghi log đầy đủ để xem nguyên nhân (constraint, connection, timeout...)
+                Logger.Log("Error SaveChanges in Product/Create: " + ex.ToString());
+                ModelState.AddModelError("", "Có lỗi khi lưu vào cơ sở dữ liệu. Vui lòng kiểm tra logs trên server.");
+            }
         }
 
         return View(product);
@@ -83,6 +104,10 @@ public class ProductController : Controller
 
     public ActionResult Edit(int id)
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         var product = db.Products.Find(id);
         if (product == null) return HttpNotFound();
         return View(product);
@@ -92,18 +117,20 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Edit(Product product)
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         if (ModelState.IsValid)
         {
             try
             {
-                // Lấy sản phẩm hiện tại từ database
                 var existingProduct = db.Products.Find(product.ProductID);
                 if (existingProduct == null)
                 {
                     return HttpNotFound();
                 }
 
-                // Xử lý upload ảnh mới (nếu có)
                 if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
                 {
                     string originalName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
@@ -146,6 +173,7 @@ public class ProductController : Controller
             }
             catch (Exception ex)
             {
+                Logger.Log("Error in Product/Edit: " + ex.ToString());
                 ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message);
             }
         }
@@ -155,6 +183,10 @@ public class ProductController : Controller
 
     public ActionResult Delete(int id)
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         var product = db.Products.Find(id);
         if (product == null) return HttpNotFound();
         return View(product);
@@ -164,6 +196,10 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult DeleteConfirmed(int id)
     {
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
         var product = db.Products.Find(id);
         if (product != null)
         {

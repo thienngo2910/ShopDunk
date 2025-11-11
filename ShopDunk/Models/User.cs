@@ -8,26 +8,27 @@ namespace ShopDunk.Models
         [Key]
         public int UserID { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
+        [Required]
+        [StringLength(50)]
         public string Username { get; set; }
 
-        [NotMapped] // Không lưu vào database
-        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [NotMapped] // Không lưu vào database
-        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
-        [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; }
-
-        // Đây là trường thực sự lưu vào database
-        public string PasswordHash { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập email")]
-        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
 
-        public string Role { get; set; } = "User";
+        [Required]
+        public string PasswordHash { get; set; }
+
+        [Required]
+        public string Role { get; set; } = "User"; // Mặc định là User
+
+        // Không lưu vào DB
+        [NotMapped]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        public string Password { get; set; }
+
+        [NotMapped]
+        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
+        public string ConfirmPassword { get; set; }
     }
 }
