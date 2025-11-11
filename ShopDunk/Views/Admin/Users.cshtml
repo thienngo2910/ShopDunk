@@ -1,83 +1,87 @@
-@model IEnumerable<ShopDunk.Models.User>
+﻿@model IEnumerable<ShopDunk.Models.User>
 @{
- ViewBag.Title = "Qu?n l� ng??i d�ng";
- int page = ViewBag.Page ??1;
- int pageSize = ViewBag.PageSize ??10;
- int total = ViewBag.Total ??0;
- string q = ViewBag.Query ?? "";
- int totalPages = (int)System.Math.Ceiling((double)total / pageSize);
+    ViewBag.Title = "Quản lý Người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin mới
+
+    int page = ViewBag.CurrentPage;
+    int pageSize = 10; // Giả định pageSize là 10 nếu không có trong ViewBag
+    int totalUsers = ViewBag.TotalPages * pageSize; // Tính toán gần đúng
+    try
+    {
+        // Cố gắng lấy giá trị chính xác nếu có
+        page = ViewBag.CurrentPage ?? 1;
+        pageSize = 10; // Đặt cứng pageSize nếu AdminController không truyền
+        totalUsers = db.Users.Count(); // Cần truy cập DB hoặc truyền từ Controller
+                                       // Tốt nhất là truyền TotalUsers từ Controller qua ViewBag
+    }
+    catch { }
+
+    string q = ViewBag.Query ?? "";
+    int totalPages = ViewBag.TotalPages;
 }
 
-<h2>Qu?n l� ng??i d�ng</h2>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Quản lý Người dùng</h1>
+</div>
 
-<p>
- <a class="btn btn-secondary" href="@Url.Action("Index", "Admin")">Tr? v?</a>
-</p>
-
-<form method="get" class="form-inline mb-3">
- <input type="text" name="q" value="@q" class="form-control mr-2" placeholder="T�m username ho?c email" />
- <button type="submit" class="btn btn-primary">T�m</button>
+<!-- Form tìm kiếm -->
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-6">
+        <input type="text" name="q" value="@q" class="form-control" placeholder="Tìm username hoặc email..." />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Tìm</button>
+    </div>
 </form>
 
-@if (TempData["Success"] != null)
-{
- <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
- <div class="alert alert-danger">@TempData["Error"]</div>
-}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Username</td>
+                    <td>@u.Email</td>
+                    <td>
+                        <span class="badge @(u.Role == "Admin" ? "bg-success" : "bg-secondary")">
+                            @u.Role
+                        </span>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("EditUser", "Admin", new { id = u.UserID })">Sửa</a>
+                        <a class="btn btn-sm btn-outline-warning" href="@Url.Action("ChangeUserPassword", "Admin", new { id = u.UserID })">Đổi MK</a>
 
-<table class="table">
- <thead>
- <tr>
- <th>Username</th>
- <th>Email</th>
- <th>Role</th>
- <th>H�nh ??ng</th>
- </tr>
- </thead>
- <tbody>
- @foreach (var u in Model)
- {
- <tr>
- <td>
- @if (u.Role == "Admin")
- {
- <a href='@Url.Action("Index", "Admin")'>@u.Username</a>
- }
- else
- {
- <a href='@Url.Action("EditUser", "Admin", new { id = u.UserID })'>@u.Username</a>
- }
- </td>
- <td>@u.Email</td>
- <td>@u.Role</td>
- <td>
- <a class="btn btn-sm btn-primary" href="@Url.Action("EditUser", "Admin", new { id = u.UserID })">S?a</a>
- <a class="btn btn-sm btn-warning" href="@Url.Action("ChangePassword", "Admin", new { id = u.UserID })">??i m?t kh?u</a>
- @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post, new { @class = "d-inline" }))
- {
- @Html.AntiForgeryToken()
- @Html.Hidden("id", u.UserID)
- <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('B?n c� ch?c mu?n x�a ng??i d�ng n�y?');">X�a</button>
- }
- </td>
- </tr>
- }
- </tbody>
-</table>
+                        @using (Html.BeginForm("DeleteUser", "Admin", new { id = u.UserID }, FormMethod.Post, new { @class = "d-inline", onsubmit = "return confirm('Bạn có chắc muốn xóa người dùng này?');" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-@if (totalPages >1)
+<!-- Phân trang -->
+@if (totalPages > 1)
 {
- <nav>
- <ul class="pagination">
- @for (int i =1; i <= totalPages; i++)
- {
- <li class="page-item @(i == page ? "active" : "")">
- <a class="page-link" href="@Url.Action("Users", "Admin", new { q = q, page = i, pageSize = pageSize })">@i</a>
- </li>
- }
- </ul>
- </nav>
+    <nav>
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Users", new { q = q, page = i })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
 }

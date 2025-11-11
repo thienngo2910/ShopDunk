@@ -1,10 +1,80 @@
-@{
- ViewBag.Title = "Qu?n tr?";
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin mới
 }
 
-<h2>Trang qu?n tr?</h2>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+</div>
 
-<p>
- <a class="btn btn-primary" href="@Url.Action("Products", "Admin")">Qu?n l� s?n ph?m</a>
- <a class="btn btn-secondary" href="@Url.Action("Users", "Admin")">Qu?n l� ng??i d�ng</a>
-</p>
+<div class="row g-4">
+    <!-- Tổng doanh thu -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm border-success">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="fs-1 text-success me-3">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title text-success">Tổng Doanh thu</h5>
+                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalRevenue.ToString("N0") ₫</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Đơn hàng chờ xử lý -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm border-warning">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="fs-1 text-warning me-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title text-warning">Đơn chờ xử lý</h5>
+                        <p class="card-text fs-4 fw-bold">@ViewBag.PendingOrders</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tổng Sản phẩm -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm border-primary">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="fs-1 text-primary me-3">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title text-primary">Tổng Sản phẩm</h5>
+                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalProducts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tổng Người dùng -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm border-info">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="fs-1 text-info me-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title text-info">Người dùng</h5>
+                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalUsers</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- (Tùy chọn: Thêm biểu đồ hoặc danh sách đơn hàng gần đây ở đây) -->

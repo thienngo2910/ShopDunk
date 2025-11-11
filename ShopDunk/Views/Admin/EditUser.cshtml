@@ -1,32 +1,64 @@
-@model ShopDunk.Models.User
+﻿@model ShopDunk.Models.User
+@using System.Web.Mvc
 @{
- ViewBag.Title = "S?a ng??i d�ng";
+    ViewBag.Title = "Sửa người dùng";
+
+    // Khai báo danh sách Role cho DropdownList
+    var roleList = new List<SelectListItem>
+{
+        new SelectListItem { Text = "User", Value = "User" },
+        new SelectListItem { Text = "Admin", Value = "Admin" }
+    };
 }
 
-<h2>S?a ng??i d�ng</h2>
+<h2>Sửa người dùng</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
 @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
 {
- @Html.AntiForgeryToken()
- @Html.HiddenFor(m => m.UserID)
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.UserID)
+    @* Thêm trường ẩn cho PasswordHash để tránh lỗi ModelState.IsValid do đây là trường [Required] trong User model *@
+    @Html.HiddenFor(m => m.PasswordHash)
 
- <div class="mb-3">
- @Html.LabelFor(m => m.Username)
- @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
- @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
- </div>
+    @Html.ValidationSummary(true, "Vui lòng kiểm tra lại thông tin:", new { @class = "text-danger" })
 
- <div class="mb-3">
- @Html.LabelFor(m => m.Email)
- @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
- @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
- </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Username)
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+    </div>
 
- <div class="mb-3">
- @Html.LabelFor(m => m.Role)
- @Html.TextBoxFor(m => m.Role, new { @class = "form-control" })
- </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Email)
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+    </div>
 
- <button type="submit" class="btn btn-primary">L?u</button>
- <a class="btn btn-secondary" href="@Url.Action("Users", "Admin")">H?y</a>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Role)
+        @* Sử dụng DropDownListFor với danh sách Role đã khai báo *@
+        @Html.DropDownListFor(
+            m => m.Role,
+            new SelectList(roleList, "Value", "Text", Model.Role),
+            new { @class = "form-select" }
+        )
+        @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-secondary" href="@Url.Action("Users", "Admin")">Hủy</a>
+}
+
+@section Scripts {
+    @* Đảm bảo đã nhúng bundle jqueryval nếu bạn muốn sử dụng client-side validation *@
+    @* @Scripts.Render("~/bundles/jqueryval") *@
 }

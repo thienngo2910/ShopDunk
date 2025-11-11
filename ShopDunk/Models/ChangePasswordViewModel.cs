@@ -1,18 +1,20 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ShopDunk.Models
 {
- public class ChangePasswordViewModel
- {
- public int UserID { get; set; }
+    public class ChangePasswordViewModel
+    {
+        public int UserID { get; set; }
 
- [Required]
- [DataType(DataType.Password)]
- [MinLength(6, ErrorMessage = "M?t kh?u ph?i �t nh?t6 k� t?")]
- public string NewPassword { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
+        [DataType(DataType.Password)]
+        [MinLength(6, ErrorMessage = "Mật khẩu phải ít nhất 6 ký tự")]
+        [Display(Name = "Mật khẩu mới")]
+        public string NewPassword { get; set; }
 
- [DataType(DataType.Password)]
- [Compare("NewPassword", ErrorMessage = "M?t kh?u x�c nh?n kh�ng kh?p")]
- public string ConfirmPassword { get; set; }
- }
+        [DataType(DataType.Password)]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]
+        [Display(Name = "Xác nhận mật khẩu mới")]
+        public string ConfirmPassword { get; set; }
+    }
 }

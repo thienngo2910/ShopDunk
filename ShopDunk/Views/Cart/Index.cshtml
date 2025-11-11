@@ -20,7 +20,8 @@
             <tr>
                 <td>@item.Product.Name</td>
                 <td>@item.Quantity</td>
-                <td>@(item.Product.Price * item.Quantity).ToString("C")</td>
+                @* --- CHỈNH SỬA: Đổi định dạng "C" (Currency) sang "N0" (Number 0) + ₫ --- *@
+                <td>@(item.Product.Price * item.Quantity).ToString("N0") ₫</td>
                 <td>
                     <a href="/Cart/Remove/@item.CartItemID" class="btn btn-sm btn-danger">Xóa</a>
                 </td>

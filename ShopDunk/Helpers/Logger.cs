@@ -12,6 +12,7 @@ namespace ShopDunk.Helpers
         {
             try
             {
+                // Lấy đường dẫn thư mục App_Data
                 string appData = HttpContext.Current?.Server.MapPath("~/App_Data");
                 if (string.IsNullOrEmpty(appData))
                 {
@@ -23,6 +24,8 @@ namespace ShopDunk.Helpers
 
                 string file = Path.Combine(appData, "logs.txt");
                 string text = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | {message}{Environment.NewLine}";
+
+                // Đảm bảo chỉ một thread ghi log tại một thời điểm
                 lock (_lock)
                 {
                     File.AppendAllText(file, text);
@@ -30,7 +33,7 @@ namespace ShopDunk.Helpers
             }
             catch
             {
-                // swallow logging errors
+                // bỏ qua các lỗi logging
             }
         }
     }

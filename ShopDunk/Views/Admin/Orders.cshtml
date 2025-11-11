@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ShopDunk.Models.Order>
+@{
+    ViewBag.Title = "Quản lý Đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    string statusFilter = ViewBag.StatusFilter;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Quản lý Đơn hàng</h1>
+</div>
+
+<!-- Bộ lọc -->
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+        @Html.DropDownList("statusFilter", (SelectList)ViewBag.StatusList, "Tất cả trạng thái", new { @class = "form-select" })
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+    </div>
+</form>
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Mã ĐH</th>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#@item.OrderID</td>
+                    <td>@(item.User?.Username ?? "[Đã xóa]")</td>
+                    <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.TotalAmount.ToString("N0") ₫</td>
+                    <td>
+                        <span class="badge
+                            @(item.Status == "Đã giao" ? "bg-success" :
+                              item.Status == "Đang giao" ? "bg-info" :
+                              item.Status == "Đã hủy" ? "bg-danger" : "bg-warning")">
+                            @item.Status
+                        </span>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("OrderDetails", new { id = item.OrderID })" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Phân trang -->
+@if (totalPages > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Orders", new { statusFilter = statusFilter, page = i })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

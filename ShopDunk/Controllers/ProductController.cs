@@ -3,18 +3,28 @@ using ShopDunk.Helpers;
 using System;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 
 public class ProductController : Controller
 {
     private AppDbContext db = new AppDbContext();
 
+    // GET: /Product/Index (Quản lý sản phẩm cho Admin)
     public ActionResult Index()
     {
+        // Kiểm tra Admin
+        if (Session["Role"]?.ToString() != "Admin")
+        {
+            return RedirectToAction("AccessDenied", "Account");
+        }
+
         var products = db.Products.ToList();
         return View(products);
     }
 
+    // GET: /Product/Details/id
     public ActionResult Details(int id)
     {
         var product = db.Products.Find(id);
@@ -22,6 +32,7 @@ public class ProductController : Controller
         return View(product);
     }
 
+    // GET: /Product/Category/name
     public ActionResult Category(string name)
     {
         var products = db.Products
@@ -32,6 +43,7 @@ public class ProductController : Controller
         return View(products);
     }
 
+    // GET: /Product/Create
     public ActionResult Create()
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -41,139 +53,117 @@ public class ProductController : Controller
         return View();
     }
 
+    // POST: /Product/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(Product product)
+    public ActionResult Create(Product product, HttpPostedFileBase ImageFile)
     {
         if (Session["Role"]?.ToString() != "Admin")
         {
             return RedirectToAction("AccessDenied", "Account");
         }
+
         try
         {
-            if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
+            if (ModelState.IsValid)
             {
-                string originalName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
-                string extension = Path.GetExtension(product.ImageFile.FileName);
-
-                // Loại bỏ ký tự đặc biệt
-                string safeName = System.Text.RegularExpressions.Regex.Replace(originalName, @"[^a-zA-Z0-9]", "_");
-
-                // Tạo tên file duy nhất
-                string fileName = safeName + "_" + Guid.NewGuid() + extension;
-
-                string folderPath = Server.MapPath("~/Images/products");
-                if (!Directory.Exists(folderPath))
+                // Xử lý upload ảnh
+                if (ImageFile != null && ImageFile.ContentLength > 0)
                 {
-                    Directory.CreateDirectory(folderPath);
+                    string fileName = Path.GetFileName(ImageFile.FileName);
+                    string extension = Path.GetExtension(fileName);
+                    string newFileName = Guid.NewGuid().ToString() + extension;
+                    string path = Path.Combine(Server.MapPath("~/Images/Products"), newFileName);
+
+                    ImageFile.SaveAs(path);
+                    product.ImageUrl = "/Images/Products/" + newFileName;
+                }
+                else
+                {
+                    // Nếu không có ảnh, dùng ảnh mặc định hoặc để null
+                    product.ImageUrl = null;
                 }
 
-                string fullPath = Path.Combine(folderPath, fileName);
-
-                // Save file (cần quyền ghi)
-                product.ImageFile.SaveAs(fullPath);
-                product.ImageUrl = "/Images/products/" + fileName;
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log chi tiết để kiểm tra (App_Data/logs.txt)
-            Logger.Log("Error saving image in Product/Create: " + ex.ToString());
-            ModelState.AddModelError("", "Lỗi khi lưu ảnh: " + ex.Message);
-        }
-
-        if (ModelState.IsValid)
-        {
-            db.Products.Add(product);
-            try
-            {
+                db.Products.Add(product);
                 db.SaveChanges();
                 TempData["Success"] = "Thêm sản phẩm thành công!";
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                // Ghi log đầy đủ để xem nguyên nhân (constraint, connection, timeout...)
-                Logger.Log("Error SaveChanges in Product/Create: " + ex.ToString());
-                ModelState.AddModelError("", "Có lỗi khi lưu vào cơ sở dữ liệu. Vui lòng kiểm tra logs trên server.");
-            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", "Lỗi khi thêm sản phẩm: " + ex.Message);
+            Logger.Log("Product Creation Error: " + ex.ToString());
         }
 
         return View(product);
     }
 
+    // GET: /Product/Edit/id
     public ActionResult Edit(int id)
     {
         if (Session["Role"]?.ToString() != "Admin")
         {
             return RedirectToAction("AccessDenied", "Account");
         }
+
         var product = db.Products.Find(id);
         if (product == null) return HttpNotFound();
+
         return View(product);
     }
 
+    // POST: /Product/Edit/id
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Edit(Product product)
+    public ActionResult Edit(Product product, HttpPostedFileBase ImageFile)
     {
         if (Session["Role"]?.ToString() != "Admin")
         {
             return RedirectToAction("AccessDenied", "Account");
         }
+
         if (ModelState.IsValid)
         {
             try
             {
-                var existingProduct = db.Products.Find(product.ProductID);
-                if (existingProduct == null)
+                var existingProduct = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
+
+                // Xử lý upload ảnh mới
+                if (ImageFile != null && ImageFile.ContentLength > 0)
                 {
-                    return HttpNotFound();
-                }
-
-                if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
-                {
-                    string originalName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
-                    string extension = Path.GetExtension(product.ImageFile.FileName);
-                    string safeName = System.Text.RegularExpressions.Regex.Replace(originalName, @"[^a-zA-Z0-9]", "_");
-                    string fileName = safeName + "_" + Guid.NewGuid() + extension;
-
-                    string folderPath = Server.MapPath("~/Images/products");
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    string fullPath = Path.Combine(folderPath, fileName);
-                    product.ImageFile.SaveAs(fullPath);
-
                     // Xóa ảnh cũ (nếu có)
                     if (!string.IsNullOrEmpty(existingProduct.ImageUrl))
                     {
-                        string oldImagePath = Server.MapPath(existingProduct.ImageUrl);
-                        if (System.IO.File.Exists(oldImagePath))
+                        string oldPath = Server.MapPath(existingProduct.ImageUrl);
+                        if (System.IO.File.Exists(oldPath))
                         {
-                            System.IO.File.Delete(oldImagePath);
+                            System.IO.File.Delete(oldPath);
                         }
                     }
 
-                    existingProduct.ImageUrl = "/Images/products/" + fileName;
+                    // Lưu ảnh mới
+                    string fileName = Path.GetFileName(ImageFile.FileName);
+                    string extension = Path.GetExtension(fileName);
+                    string newFileName = Guid.NewGuid().ToString() + extension;
+                    string path = Path.Combine(Server.MapPath("~/Images/Products"), newFileName);
+
+                    ImageFile.SaveAs(path);
+                    product.ImageUrl = "/Images/Products/" + newFileName;
+                }
+                else
+                {
+                    // Giữ lại ảnh cũ nếu không upload ảnh mới
+                    product.ImageUrl = existingProduct.ImageUrl;
                 }
 
-                // Cập nhật các trường khác
-                existingProduct.Name = product.Name;
-                existingProduct.Description = product.Description;
-                existingProduct.Price = product.Price;
-                existingProduct.Stock = product.Stock;
-                existingProduct.Category = product.Category;
-
+                db.Entry(product).State = EntityState.Modified;
                 db.SaveChanges();
                 TempData["Success"] = "Cập nhật sản phẩm thành công!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                Logger.Log("Error in Product/Edit: " + ex.ToString());
                 ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message);
             }
         }
@@ -181,6 +171,7 @@ public class ProductController : Controller
         return View(product);
     }
 
+    // GET: /Product/Delete/id
     public ActionResult Delete(int id)
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -192,6 +183,7 @@ public class ProductController : Controller
         return View(product);
     }
 
+    // POST: /Product/DeleteConfirmed/id
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public ActionResult DeleteConfirmed(int id)

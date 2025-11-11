@@ -13,6 +13,7 @@ public class AccountController : Controller
     public ActionResult Login() => View();
 
     [HttpPost]
+    [ValidateAntiForgeryToken] // Thêm AntiForgeryToken
     public ActionResult Login(string username, string password)
     {
         username = username.Trim();
@@ -51,19 +52,20 @@ public class AccountController : Controller
             var existing = db.Users.FirstOrDefault(u => u.Username == model.Username);
             if (existing != null)
             {
-                ViewBag.Error = "Tên đăng nhập đã tồn tại.";
+                ViewBag.Error = "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.";
                 return View(model);
             }
 
-            var user = new User
+            // Tạo User mới từ ViewModel
+            var newUser = new User
             {
-                Username = model.Username.Trim(),
+                Username = model.Username,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                Role = model.Username.Equals("admin", StringComparison.OrdinalIgnoreCase) ? "Admin" : "User"
+                Role = "User" // Mặc định là User
             };
 
-            db.Users.Add(user);
+            db.Users.Add(newUser);
             db.SaveChanges();
 
             TempData["Success"] = "Đăng ký thành công. Vui lòng đăng nhập.";
@@ -79,6 +81,7 @@ public class AccountController : Controller
     {
         if (Session["UserID"] == null)
         {
+            TempData["Error"] = "Vui lòng đăng nhập để đổi mật khẩu.";
             return RedirectToAction("Login");
         }
 
@@ -92,6 +95,7 @@ public class AccountController : Controller
     {
         if (Session["UserID"] == null)
         {
+            TempData["Error"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
             return RedirectToAction("Login");
         }
 
@@ -116,6 +120,7 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    // Hàm băm mật khẩu
     private string HashPassword(string password)
     {
         using (SHA256 sha = SHA256.Create())
@@ -123,5 +128,14 @@ public class AccountController : Controller
             byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
             return BitConverter.ToString(bytes).Replace("-", "").ToLower();
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            db.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }
