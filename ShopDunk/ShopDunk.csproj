@@ -136,9 +136,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ImageHelper.cs" />
-    <Compile Include="Helpers\Logger.cs" />
-    <Compile Include="Helpers\SecurityHelper.cs" />
     <Compile Include="Migrations\202511070715548_InitialCreate.cs" />
     <Compile Include="Migrations\202511070715548_InitialCreate.Designer.cs">
       <DependentUpon>202511070715548_InitialCreate.cs</DependentUpon>
@@ -202,9 +199,6 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Images\Banners\banner1.png" />
-    <Content Include="Images\Banners\banner2.png" />
-    <Content Include="Images\Banners\banner3.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -240,7 +234,7 @@
     <Content Include="Views\Cart\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Product\_ProductCard.cshtml" />
+    <Content Include="Views\Shared\_ProductCard.cshtml" />
     <Content Include="Views\Product\Create.cshtml" />
     <Content Include="Views\Product\Edit.cshtml" />
     <Content Include="Views\Product\Delete.cshtml" />
@@ -253,6 +247,7 @@
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Admin\Orders.cshtml" />
     <Content Include="Views\Admin\OrderDetails.cshtml" />
+    <Content Include="Views\Product\Category.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
@@ -305,7 +300,7 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\products\" />
+    <Folder Include="Images\Products\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

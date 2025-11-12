@@ -15,12 +15,14 @@
     </thead>
     <tbody>
         @foreach (var item in Model)
+
         {
             <tr>
                 <td>@item.Product.Name</td>
                 <td>@item.Quantity</td>
-                @* --- CHỈNH SỬA: Đổi định dạng "C" (Currency) sang "N0" (Number 0) + ₫ --- *@
-                <td>@(item.Product.Price * item.Quantity).ToString("N0") ₫</td>
+                @* --- SỬA LỖI: Thêm 1 cặp ( ) bao quanh .ToString("N0") --- *@
+                <td>@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
+
             </tr>
         }
     </tbody>

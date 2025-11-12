@@ -14,36 +14,20 @@ namespace ShopDunk.Controllers
         {
             var products = db.Products.ToList();
 
-            // Lấy 8 sản phẩm cho mỗi danh mục
+            // Lấy 4 sản phẩm cho mỗi danh mục
             ViewBag.iPhones = products
                 .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("iPhone", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
+                .Take(4)
                 .ToList();
 
             ViewBag.iPads = products
                 .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("iPad", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
+                .Take(4)
                 .ToList();
 
             ViewBag.Macs = products
                 .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("Mac", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
-                .ToList();
-
-            // --- THÊM MỚI CÁC DANH MỤC KHÁC ---
-            ViewBag.Watch = products
-                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("Watch", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
-                .ToList();
-
-            ViewBag.Audio = products
-                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("Âm thanh", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
-                .ToList();
-
-            ViewBag.Accessories = products
-                .Where(p => !string.IsNullOrEmpty(p.Category) && p.Category.Equals("Phụ kiện", StringComparison.OrdinalIgnoreCase))
-                .Take(8)
+                .Take(4)
                 .ToList();
 
             // Trả model về view (vẫn giữ nguyên để tương thích)

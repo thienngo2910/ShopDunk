@@ -1,30 +1,25 @@
 ﻿@model IEnumerable<ShopDunk.Models.User>
 @{
     ViewBag.Title = "Quản lý Người dùng";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin mới
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    // Sử dụng layout Admin mới
 
-    int page = ViewBag.CurrentPage;
-    int pageSize = 10; // Giả định pageSize là 10 nếu không có trong ViewBag
-    int totalUsers = ViewBag.TotalPages * pageSize; // Tính toán gần đúng
-    try
-    {
-        // Cố gắng lấy giá trị chính xác nếu có
-        page = ViewBag.CurrentPage ?? 1;
-        pageSize = 10; // Đặt cứng pageSize nếu AdminController không truyền
-        totalUsers = db.Users.Count(); // Cần truy cập DB hoặc truyền từ Controller
-                                       // Tốt nhất là truyền TotalUsers từ Controller qua ViewBag
-    }
-    catch { }
-
+    // Lấy các giá trị đã được gửi từ AdminController
+    int page = ViewBag.CurrentPage ?? 1;
     string q = ViewBag.Query ?? "";
     int totalPages = ViewBag.TotalPages;
+
+    /* --- SỬA LỖI ---
+        Đã xóa bỏ toàn bộ khối "try...catch" (từ đến )
+        vì nó cố gắng truy cập 'db' từ View, gây ra lỗi.
+        Các giá trị 'page' và 'totalPages' đã được Controller cung cấp.
+    */
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Quản lý Người dùng</h1>
 </div>
 
-<!-- Form tìm kiếm -->
 <form method="get" class="row g-3 mb-3">
     <div class="col-md-6">
         <input type="text" name="q" value="@q" class="form-control" placeholder="Tìm username hoặc email..." />
@@ -37,6 +32,7 @@
 <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
+
             <tr>
                 <th>Username</th>
                 <th>Email</th>
@@ -45,24 +41,30 @@
             </tr>
         </thead>
         <tbody>
+
             @foreach (var u in Model)
             {
                 <tr>
                     <td>@u.Username</td>
                     <td>@u.Email</td>
+
                     <td>
-                        <span class="badge @(u.Role == "Admin" ? "bg-success" : "bg-secondary")">
+                        <span class="badge @(u.Role == "Admin" ?
+"bg-success" : "bg-secondary")">
                             @u.Role
                         </span>
                     </td>
                     <td>
+
                         <a class="btn btn-sm btn-outline-primary" href="@Url.Action("EditUser", "Admin", new { id = u.UserID })">Sửa</a>
                         <a class="btn btn-sm btn-outline-warning" href="@Url.Action("ChangeUserPassword", "Admin", new { id = u.UserID })">Đổi MK</a>
 
-                        @using (Html.BeginForm("DeleteUser", "Admin", new { id = u.UserID }, FormMethod.Post, new { @class = "d-inline", onsubmit = "return confirm('Bạn có chắc muốn xóa người dùng này?');" }))
+                        @using (Html.BeginForm("DeleteUser", "Admin", new { id = u.UserID }, FormMethod.Post, new
+                        { @class = "d-inline", onsubmit = "return confirm('Bạn có chắc muốn xóa người dùng này?');" }))
                         {
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+
                         }
                     </td>
                 </tr>
@@ -71,17 +73,19 @@
     </table>
 </div>
 
-<!-- Phân trang -->
 @if (totalPages > 1)
 {
     <nav>
+
         <ul class="pagination justify-content-center">
-            @for (int i = 1; i <= totalPages; i++)
+            @for (int i = 1;
+i <= totalPages; i++)
             {
                 <li class="page-item @(i == page ? "active" : "")">
                     <a class="page-link" href="@Url.Action("Users", new { q = q, page = i })">@i</a>
                 </li>
             }
+
         </ul>
     </nav>
 }

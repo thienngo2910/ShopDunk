@@ -1,0 +1,26 @@
+﻿@model IEnumerable<ShopDunk.Models.Product>
+
+@{
+    ViewBag.Title = "Danh mục " + ViewBag.CategoryName;
+    // Trang này sẽ sử dụng layout chung
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="category-title">@ViewBag.Title</h2>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Không tìm thấy sản phẩm nào trong danh mục này.</p>
+    }
+    else
+    {
+        foreach (var p in Model)
+        {
+            @* Sử dụng lại Partial View _ProductCard để hiển thị sản phẩm *@
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
+        }
+    }
+</div>

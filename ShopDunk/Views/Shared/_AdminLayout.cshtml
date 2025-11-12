@@ -2,180 +2,105 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Trang Quản Trị ShopDunk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         body {
-            font-size: .875rem;
+            /* Thêm khoảng đệm ở trên cùng để nội dung không bị Navbar che */
+            padding-top: 56px;
+            background-color: #f8f9fa; /* Màu nền xám nhạt cho thân trang */
         }
 
-        .feather {
-            width: 16px;
-            height: 16px;
+        /* Tùy chỉnh màu active cho nav-link */
+        .navbar-dark .navbar-nav .nav-link.active {
+            font-weight: bold;
+            color: #fff;
         }
 
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 48px 0 0; /* Height of navbar */
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            background-color: #f8f9fa;
+        /* Căn chỉnh icon và chữ */
+        .navbar-nav .nav-link i {
+            width: 20px;
+            margin-right: 0.25rem;
         }
 
-        .sidebar-sticky {
-            position: relative;
-            top: 0;
-            height: calc(100vh - 48px);
-            padding-top: .5rem;
-            overflow-x: hidden;
-            overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 0.25rem;
         }
-
-        .sidebar .nav-link {
-            font-weight: 500;
-            color: #333;
-        }
-
-            .sidebar .nav-link .feather {
-                margin-right: 4px;
-                color: #727272;
-            }
-
-            .sidebar .nav-link.active {
-                color: #007bff;
-            }
-
-        .sidebar-heading {
-            font-size: .75rem;
-            text-transform: uppercase;
-        }
-
-        /* Navbar */
-        .navbar-brand {
-            padding-top: .75rem;
-            padding-bottom: .75rem;
-            font-size: 1rem;
-            background-color: rgba(0, 0, 0, .25);
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
-        }
-
-        .navbar .navbar-toggler {
-            top: .25rem;
-            right: 1rem;
-        }
-
-        .main-content {
-            margin-left: 220px; /* Same as sidebar width */
-            padding-top: 56px; /* Height of navbar */
-        }
-
-        /* Navbar (Top) */
-        .navbar-top {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 220px; /* Same as sidebar width */
-            z-index: 99;
-            box-shadow: 0 2px 4px rgba(0,0,0,.08);
-        }
-
-        /* Sidebar (Left) */
-        .sidebar {
-            width: 220px;
-            background-color: #fff;
-            border-right: 1px solid #dee2e6;
-        }
-
-            .sidebar .nav-link {
-                padding: .75rem 1.5rem;
-                display: flex;
-                align-items: center;
-            }
-
-                .sidebar .nav-link i {
-                    width: 20px;
-                    margin-right: .75rem;
-                    text-align: center;
-                }
     </style>
 </head>
 <body>
 
-    <!-- Thanh điều hướng bên trái (Sidebar) -->
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-        <div class="position-sticky pt-3">
-            <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                <span>ShopDunk Admin</span>
-            </h5>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link @(ViewBag.Title == "Dashboard" ? "active" : "")" aria-current="page" href="@Url.Action("Index", "Admin")">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(ViewBag.Title.Contains("Đơn hàng") ? "active" : "")" href="@Url.Action("Orders", "Admin")">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        Quản lý Đơn hàng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(ViewBag.Title.Contains("Sản phẩm") ? "active" : "")" href="@Url.Action("Index", "Product")">
-                        <i class="fas fa-box-open"></i>
-                        Quản lý Sản phẩm
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(ViewBag.Title.Contains("Người dùng") ? "active" : "")" href="@Url.Action("Users", "Admin")">
-                        <i class="fas fa-users"></i>
-                        Quản lý Người dùng
-                    </a>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+        <div class="container-fluid">
 
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                <span>Tài khoản</span>
-            </h6>
-            <ul class="nav flex-column mb-2">
-                <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Index", "Home")" target="_blank">
-                        <i class="fas fa-store"></i>
-                        Xem trang bán hàng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Logout", "Account")">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Đăng xuất
-                    </a>
-                </li>
-            </ul>
+            <a class="navbar-brand" href="@Url.Action("Index", "Admin")">
+                <i class="fas fa-shield-halved me-2"></i>
+                ShopDunk Admin
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="adminNavbar">
+
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title == "Dashboard" ? "active" : "")" href="@Url.Action("Index", "Admin")">
+                            <i class="fas fa-tachometer-alt"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title.Contains("Đơn hàng") ? "active" : "")" href="@Url.Action("Orders", "Admin")">
+                            <i class="fas fa-file-invoice-dollar"></i>Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title.Contains("Sản phẩm") ? "active" : "")" href="@Url.Action("Index", "Product")">
+                            <i class="fas fa-box-open"></i>Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title.Contains("Người dùng") ? "active" : "")" href="@Url.Action("Users", "Admin")">
+                            <i class="fas fa-users"></i>Người dùng
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Home")" target="_blank">
+                            <i class="fas fa-store"></i>Xem trang bán hàng
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i>Chào, <strong>@Session["Username"]</strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Logout", "Account")">
+                                    <i class="fas fa-sign-out-alt"></i>Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <!-- Thanh điều hướng bên trên (Top Navbar) -->
-    <nav class="navbar navbar-light bg-white navbar-top p-0">
-        <div class="container-fluid d-flex justify-content-end align-items-center p-2">
-            <span class="navbar-text me-3">
-                Chào, <strong>@Session["Username"]</strong>
-            </span>
-        </div>
-    </nav>
-
-    <!-- Nội dung chính -->
-    <main class="main-content p-4">
+    <main role="main" class="container-fluid py-4">
 
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type"button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
         @if (TempData["Error"] != null)
@@ -186,7 +111,12 @@
             </div>
         }
 
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">@ViewBag.Title</h1>
+        </div>
+
         @RenderBody()
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

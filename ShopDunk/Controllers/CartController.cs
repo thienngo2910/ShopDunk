@@ -21,8 +21,9 @@ public class CartController : Controller
         return View(cartItems);
     }
 
-    // GET: /Cart/Add/productId
-    public ActionResult Add(int productId)
+    // *** SỬA LỖI: Đổi tên tham số 'productId' thành 'id' ***
+    // GET: /Cart/Add/id
+    public ActionResult Add(int id) // <-- ĐÃ SỬA TẠI ĐÂY
     {
         if (Session["UserID"] == null)
         {
@@ -31,7 +32,9 @@ public class CartController : Controller
         }
 
         int userId = (int)Session["UserID"];
-        var item = db.CartItems.FirstOrDefault(c => c.ProductID == productId && c.UserID == userId);
+
+        // *** SỬA LỖI: Dùng 'id' để tìm kiếm ***
+        var item = db.CartItems.FirstOrDefault(c => c.ProductID == id && c.UserID == userId);
 
         if (item != null)
         {
@@ -39,7 +42,8 @@ public class CartController : Controller
         }
         else
         {
-            db.CartItems.Add(new CartItem { ProductID = productId, UserID = userId, Quantity = 1 });
+            // *** SỬA LỖI: Dùng 'id' để thêm mới ***
+            db.CartItems.Add(new CartItem { ProductID = id, UserID = userId, Quantity = 1 });
         }
 
         db.SaveChanges();

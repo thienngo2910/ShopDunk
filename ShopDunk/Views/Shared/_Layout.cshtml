@@ -4,15 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - ShopDunk</title>
-    <!-- Thư viện CSS bên ngoài -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- CSS tùy chỉnh -->
     <link href="~/Content/shopdunk.css" rel="stylesheet" />
 </head>
 <body>
-    <!-- Navbar chính (Danh mục & Chức năng) -->
     <nav class="navbar navbar-expand-lg main-navbar">
         <div class="container">
             <a class="navbar-brand" href="/">ShopDunk</a>
@@ -22,43 +19,52 @@
             </button>
 
             <div class="collapse navbar-collapse" id="mainNavbarContent">
-                <!-- Danh mục sản phẩm (Bên trái) -->
                 <ul class="navbar-nav nav-categories">
                     <li class="nav-item"><a class="nav-link" href="/Product/Category/iPhone">iPhone</a></li>
                     <li class="nav-item"><a class="nav-link" href="/Product/Category/iPad">iPad</a></li>
                     <li class="nav-item"><a class="nav-link" href="/Product/Category/Mac">Mac</a></li>
+
+                    @* --- SỬA LỖI: Bổ sung các danh mục còn thiếu --- *@
+                    <li class="nav-item"><a class="nav-link" href="/Product/Category/Watch">Watch</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Product/Category/Âm thanh">Âm thanh</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Product/Category/Phụ kiện">Phụ kiện</a></li>
                 </ul>
 
-                <!-- (PHẦN MỚI) Ô tìm kiếm - căn sang phải (ms-auto) -->
+
                 <form class="d-flex ms-auto me-3" role="search">
                     <input class="form-control form-control-sm" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
                 </form>
 
-                <!-- Icons chức năng (Bên phải) -->
                 <ul class="navbar-nav nav-icons">
-                    <!-- Biểu tượng Tìm kiếm cũ đã bị xóa/thay thế bằng form ở trên -->
                     <li class="nav-item"><a class="nav-link" href="/Cart"><i class="fas fa-shopping-cart"></i></a></li>
 
-                    @* --- PHẦN DROPDOWN CHO TÀI KHOẢN --- *@
+                    @* --- PHẦN
+                        DROPDOWN CHO TÀI KHOẢN --- *@
                     @if (Session["Username"] != null)
                     {
                         <li class="nav-item dropdown">
+
                             <a class="nav-link dropdown-toggle text-success" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user"></i>
                             </a>
+
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
                                 <li><span class="dropdown-item-text fw-bold">@Session["Username"]</span></li>
                                 <li><hr class="dropdown-divider"></li>
+
                                 @if (Session["Role"]?.ToString() == "Admin")
                                 {
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i> Trang Admin</a></li>
+
                                 }
                                 <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Account")"><i class="fas fa-key me-2"></i> Đổi mật khẩu</a></li>
                                 <li><a class="dropdown-item text-danger" href="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+
                             </ul>
                         </li>
                     }
                     else
+
                     {
                         <li class="nav-item"><a class="nav-link" href="/Account/Login"><i class="fas fa-user"></i></a></li>
                     }
@@ -67,58 +73,73 @@
         </div>
     </nav>
 
-    <!-- Container chính cho nội dung trang -->
     <div class="container">
-        <!-- Áp dụng .main-container cho mọi trang TRỪ trang chủ -->
         @if (ViewBag.Title == "Trang chủ")
         {
-            @RenderBody() <!-- Trang chủ không cần bọc -->
-        }
+            @RenderBody() }
         else
         {
+
             <div class="main-container p-4 p-md-5">
                 @RenderBody()
             </div>
         }
     </div>
 
-    <!-- Footer Mới -->
     <footer class="main-footer">
         <div class="container">
             <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4
+col-md-6">
                     <h5>ShopDunk</h5>
-                    <p>ShopDunk là đại lý uỷ quyền chính thức của Apple tại Việt Nam. Chúng tôi mang đến những sản phẩm Apple chính hãng với giá tốt nhất cùng dịch vụ chăm sóc khách hàng vượt trội.</p>
+                    <p>
+                        ShopDunk là đại lý uỷ quyền chính thức của Apple tại Việt Nam.
+                        Chúng tôi mang đến những sản phẩm Apple chính hãng với giá tốt nhất cùng dịch vụ chăm sóc khách hàng vượt trội.
+                    </p>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <h5>Sản phẩm</h5>
                     <ul>
+
                         <li><a href="/Product/Category/iPhone">iPhone</a></li>
                         <li><a href="/Product/Category/iPad">iPad</a></li>
                         <li><a href="/Product/Category/Mac">Mac</a></li>
+
+                        @* --- SỬA LỖI: Bổ sung các danh mục còn thiếu --- *@
+                        <li><a href="/Product/Category/Watch">Watch</a></li>
+                        <li><a href="/Product/Category/Âm thanh">Âm thanh</a></li>
+                        <li><a href="/Product/Category/Phụ kiện">Phụ kiện</a></li>
                     </ul>
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5>Chính sách</h5>
                     <ul>
                         <li><a href="#">Chính sách bảo hành</a></li>
+
                         <li><a href="#">Chính sách đổi trả</a></li>
                         <li><a href="#">Chính sách bảo mật</a></li>
                         <li><a href="#">Chính sách giao hàng</a></li>
                     </ul>
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5>Liên hệ</h5>
                     <p>
                         <strong>Hotline:</strong> 1900.1234<br>
+
                         <strong>Email:</strong> support@shopdunk.com<br>
                         <strong>Địa chỉ:</strong> 123 Nguyễn Văn Linh, Q.7, TP.HCM
                     </p>
                 </div>
+
             </div>
 
             <div class="footer-bottom">
-                <p>© 2025 ShopDunk Clone. All rights reserved.</p>
+                <p>
+                    © 2025 ShopDunk Clone.
+                    All rights reserved.
+                </p>
             </div>
         </div>
     </footer>

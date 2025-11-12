@@ -1,9 +1,8 @@
 ﻿@model IEnumerable<ShopDunk.Models.CartItem>
-@{
-    ViewBag.Title = "Giỏ hàng";
-}
 
-<h2>Giỏ hàng của bạn</h2>
+@{
+    <h2>Giỏ hàng của bạn</h2>
+}
 
 <table class="table">
     <thead>
@@ -11,6 +10,7 @@
             <th>Sản phẩm</th>
             <th>Số lượng</th>
             <th>Giá</th>
+            <th>Thành tiền</th>
             <th></th>
         </tr>
     </thead>
@@ -20,14 +20,19 @@
             <tr>
                 <td>@item.Product.Name</td>
                 <td>@item.Quantity</td>
-                @* --- CHỈNH SỬA: Đổi định dạng "C" (Currency) sang "N0" (Number 0) + ₫ --- *@
-                <td>@(item.Product.Price * item.Quantity).ToString("N0") ₫</td>
+
+                @* --- SỬA LỖI: Thêm 1 cặp ( ) bao quanh .ToString("N0") --- *@
+                <td>@((item.Product.Price).ToString("N0")) ₫</td>
+
+                @* Dòng này đã đúng, không cần sửa *@
+                <td>@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
+
                 <td>
-                    <a href="/Cart/Remove/@item.CartItemID" class="btn btn-sm btn-danger">Xóa</a>
+                    <a href="/Cart/Remove/@item.CartItemID" class="btn btn-danger btn-sm">Xóa</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<a href="/Order/Checkout" class="btn btn-success">Tiến hành đặt hàng</a>
+<a href="@Url.Action("Checkout", "Order")" class="btn btn-success">Tiến hành đặt hàng</a>
