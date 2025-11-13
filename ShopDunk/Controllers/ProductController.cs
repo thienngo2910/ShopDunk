@@ -1,20 +1,43 @@
 ﻿using ShopDunk.Models;
-//using ShopDunk.Helpers; // Vô hiệu hóa 'Helpers' vì chúng ta không có file Logger.cs
 using System;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 public class ProductController : Controller
 {
     private AppDbContext db = new AppDbContext();
 
-    // Đặt giới hạn kích thước file (ví dụ: 5MB)
     private const int MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-    // GET: /Product/Index
+    // *** THÊM ACTION MỚI ĐỂ XỬ LÝ TÌM KIẾM ***
+    // GET: /Product/Search?q=...
+    public ActionResult Search(string q)
+    {
+        var products = new List<Product>();
+
+        if (!string.IsNullOrEmpty(q))
+        {
+            products = db.Products
+                         .Where(p => p.Name.Contains(q) || p.Description.Contains(q))
+                         .ToList();
+        }
+        else
+        {
+            // Nếu không có truy vấn, có thể trả về trang trống hoặc trang chủ
+            return RedirectToAction("Index", "Home");
+        }
+
+        ViewBag.Query = q;
+        return View(products); // Sẽ trả về view mới: Views/Product/Search.cshtml
+    }
+    // *** KẾT THÚC ACTION MỚI ***
+
+    // GET: /Product/Index (Trang quản lý sản phẩm của Admin)
     public ActionResult Index()
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -25,7 +48,7 @@ public class ProductController : Controller
         return View(products);
     }
 
-    // GET: /Product/Details/id
+    // GET: /Product/Details/id (Trang chi tiết sản phẩm cho khách hàng)
     public ActionResult Details(int id)
     {
         var product = db.Products.Find(id);
@@ -33,17 +56,38 @@ public class ProductController : Controller
         return View(product);
     }
 
-    // GET: /Product/Category/name
-    public ActionResult Category(string name)
+    // GET: /Product/Category/id (Trang danh mục sản phẩm cho khách hàng)
+    public ActionResult Category(string id, string sortBy = "default")
     {
-        var products = db.Products
-                         .Where(p => p.Category != null && p.Category.ToLower() == name.ToLower())
-                         .ToList();
-        ViewBag.CategoryName = name;
+        var productsQuery = db.Products
+                              .Where(p => p.Category != null && p.Category.ToLower() == id.ToLower());
+
+        switch (sortBy)
+        {
+            case "price_asc":
+                productsQuery = productsQuery.OrderBy(p => p.Price);
+                break;
+            case "price_desc":
+                productsQuery = productsQuery.OrderByDescending(p => p.Price);
+                break;
+            default:
+                productsQuery = productsQuery.OrderByDescending(p => p.ProductID);
+                break;
+        }
+
+        var products = productsQuery.ToList();
+
+        ViewBag.CategoryName = id;
+        ViewBag.SortBy = sortBy;
+
+        ViewBag.Sliders = db.SliderImages
+            .Where(s => s.CategoryKey.ToLower() == id.ToLower() && s.IsActive)
+            .ToList();
+
         return View(products);
     }
 
-    // GET: /Product/Create
+    // GET: /Product/Create (Trang tạo sản phẩm của Admin)
     public ActionResult Create()
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -56,7 +100,6 @@ public class ProductController : Controller
     // POST: /Product/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    // *** SỬA LỖI BINDING: Xóa tham số 'ImageFile' thừa ***
     public ActionResult Create(Product product)
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -66,14 +109,11 @@ public class ProductController : Controller
 
         try
         {
-            // *** SỬA LỖI BINDING: Đọc file từ product.ImageFile ***
             if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
             {
-                // *** THÊM MỚI: Kiểm tra kích thước file ***
                 if (product.ImageFile.ContentLength > MAX_FILE_SIZE)
                 {
                     ModelState.AddModelError("ImageFile", "Ảnh không được vượt quá 5MB.");
-                    // Trả về View mà không làm sập server
                     return View(product);
                 }
 
@@ -97,7 +137,6 @@ public class ProductController : Controller
                 product.ImageUrl = null;
             }
 
-            // Chỉ lưu nếu Model hợp lệ (bao gồm cả lỗi kích thước file ở trên)
             if (ModelState.IsValid)
             {
                 db.Products.Add(product);
@@ -108,17 +147,13 @@ public class ProductController : Controller
         }
         catch (Exception ex)
         {
-            // *** VẪN GIỮ: Vô hiệu hóa Logger.Log để tránh sập server ***
-            // Logger.Log("Product Creation Error: " + ex.ToString());
-
             ModelState.AddModelError("", "LỖI HỆ THỐNG KHI LƯU FILE: " + ex.Message);
         }
 
-        // Quay lại View nếu có lỗi
         return View(product);
     }
 
-    // GET: /Product/Edit/id
+    // GET: /Product/Edit/id (Trang sửa sản phẩm của Admin)
     public ActionResult Edit(int id)
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -133,7 +168,6 @@ public class ProductController : Controller
     // POST: /Product/Edit/id
     [HttpPost]
     [ValidateAntiForgeryToken]
-    // *** SỬA LỖI BINDING: Xóa tham số 'ImageFile' thừa ***
     public ActionResult Edit(Product product)
     {
         if (Session["Role"]?.ToString() != "Admin")
@@ -143,17 +177,14 @@ public class ProductController : Controller
 
         try
         {
-            // *** SỬA LỖI BINDING: Đọc file từ product.ImageFile ***
             if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
             {
-                // *** THÊM MỚI: Kiểm tra kích thước file ***
                 if (product.ImageFile.ContentLength > MAX_FILE_SIZE)
                 {
                     ModelState.AddModelError("ImageFile", "Ảnh không được vượt quá 5MB.");
                     return View(product);
                 }
 
-                // Lấy sản phẩm cũ để xóa ảnh (nếu có)
                 var existingProduct = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
                 if (existingProduct != null && !string.IsNullOrEmpty(existingProduct.ImageUrl))
                 {
@@ -164,7 +195,6 @@ public class ProductController : Controller
                     }
                 }
 
-                // Lưu ảnh mới
                 string fileName = Path.GetFileName(product.ImageFile.FileName);
                 string extension = Path.GetExtension(fileName);
                 string newFileName = Guid.NewGuid().ToString() + extension;
@@ -179,7 +209,6 @@ public class ProductController : Controller
                 product.ImageFile.SaveAs(path);
                 product.ImageUrl = "/Images/Products/" + newFileName;
             }
-            // (Không có 'else' ở đây, nếu không upload ảnh mới thì giữ nguyên ảnh cũ đã được bind)
 
             if (ModelState.IsValid)
             {
@@ -197,7 +226,7 @@ public class ProductController : Controller
         return View(product);
     }
 
-    // GET: /Product/Delete/id
+    // GET: /Product/Delete/id (Trang xác nhận xóa của Admin)
     public ActionResult Delete(int id)
     {
         if (Session["Role"]?.ToString() != "Admin")

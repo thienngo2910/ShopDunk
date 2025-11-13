@@ -1,77 +1,121 @@
 ﻿@model List<ShopDunk.Models.Product>
 @{
     ViewBag.Title = "Trang chủ";
+    // Lấy danh sách slider từ ViewBag
+    var sliders = (List<ShopDunk.Models.SliderImage>)ViewBag.Sliders;
 }
 
-<div id="heroCarousel" class="carousel slide mb-5 shadow-sm" data-bs-ride="carousel" data-bs-interval="3000">
+@* =============== START SLIDER (ĐỘNG TỪ CSDL) =============== *@
+@if (sliders != null && sliders.Any())
+{
+    <div id="heroCarousel" class="carousel slide mb-5 shadow-sm" data-bs-ride="carousel" data-bs-interval="3000">
 
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <div class="carousel-indicators">
+            @for (int i = 0; i < sliders.Count; i++)
+            {
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i"
+                        class="@(i == 0 ? "active" : "")"
+                        aria-current="@(i == 0 ? "true" : "false")"
+                        aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+
+        <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
+            @for (int i = 0; i < sliders.Count; i++)
+            {
+                <div class="carousel-item @(i == 0 ? "active" : "")">
+                    <img src="@sliders[i].ImageUrl" class="d-block w-100" alt="@sliders[i].Title">
+                </div>
+            }
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
+}
+@* =============== END SLIDER =============== *@
 
-    <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
-        <div class="carousel-item active">
-            <img src="https://placehold.co/1200x400/E9E9E9/B2B2B2?text=iPhone+15+Pro" class="d-block w-100" alt="iPhone Banner">
-        </div>
-        <div class="carousel-item">
-            <img src="https://placehold.co/1200x400/DDEEFF/88AACF?text=iPad+Air" class="d-block w-100" alt="iPad Banner">
-        </div>
-        <div class="carousel-item">
-            <img src="https://placehold.co/1200x400/333333/AAAAAA?text=MacBook+Pro" class="d-block w-100" alt="Mac Banner">
-        </div>
-    </div>
 
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
 <div class="category-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="category-title">iPhone</h2>
         <a href="/Product/Category/iPhone" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
     </div>
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4
-g-4">
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.iPhones)
         {
-            @Html.Partial("_ProductCard", p)
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
         }
     </div>
 </div>
 
 <div class="category-section mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="category-title">
-            iPad
-        </h2>
+        <h2 class="category-title">iPad</h2>
         <a href="/Product/Category/iPad" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
     </div>
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.iPads)
         {
-            @Html.Partial("_ProductCard", p)
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
         }
     </div>
 </div>
 
 <div class="category-section mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="category-title">
-            Mac
-        </h2>
+        <h2 class="category-title">Mac</h2>
         <a href="/Product/Category/Mac" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
     </div>
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.Macs)
         {
-            @Html.Partial("_ProductCard", p)
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
+        }
+    </div>
+</div>
+
+<div class="category-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="category-title">Watch</h2>
+        <a href="/Product/Category/Watch" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.Watch)
+        {
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
+        }
+    </div>
+</div>
+
+<div class="category-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="category-title">Âm thanh</h2>
+        <a href="/Product/Category/Âm thanh" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.Audio)
+        {
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
+        }
+    </div>
+</div>
+
+<div class="category-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="category-title">Phụ kiện</h2>
+        <a href="/Product/Category/Phụ kiện" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var p in (List<ShopDunk.Models.Product>)ViewBag.Accessories)
+        {
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
         }
     </div>
 </div>

@@ -1,0 +1,52 @@
+﻿@model ShopDunk.Models.SliderImage
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var existingKeys = (List<string>)ViewBag.ExistingKeys;
+}
+
+<h2>Sửa Slider</h2>
+
+@using (Html.BeginForm("EditSlider", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SliderImageID)
+    @Html.HiddenFor(m => m.ImageUrl) @* Giữ lại ảnh cũ nếu không upload file mới *@
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.CategoryKey)
+        @Html.TextBoxFor(m => m.CategoryKey, new { @class = "form-control", list = "category-keys" })
+        @Html.ValidationMessageFor(m => m.CategoryKey, "", new { @class = "text-danger" })
+        <datalist id="category-keys">
+            @foreach (var key in existingKeys)
+            {
+                <option value="@key"></option>
+            }
+        </datalist>
+        <small class="form-text text-muted">Nhập 'Home' cho trang chủ, 'iPhone' cho trang iPhone, v.v.</small>
+    </div>
+
+    <div class="mb-3">
+        <label>Ảnh hiện tại</label><br />
+        <img src="@Model.ImageUrl" style="max-width: 300px; max-height: 100px; object-fit: cover; border: 1px solid #ddd;" />
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.ImageFile, "Tải ảnh mới (để trống nếu không muốn thay đổi)")
+        @Html.TextBoxFor(m => m.ImageFile, new { type = "file", @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ImageFile, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+    </div>
+
+    <div class="mb-3 form-check">
+        @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+        @Html.LabelFor(m => m.IsActive, new { @class = "form-check-label" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    <a href="@Url.Action("Sliders")" class="btn btn-secondary">Hủy</a>
+}

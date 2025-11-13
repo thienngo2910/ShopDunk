@@ -164,6 +164,10 @@
     <Compile Include="Migrations\202511110939190_AddOrderNavigationProperties.Designer.cs">
       <DependentUpon>202511110939190_AddOrderNavigationProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511130716485_SliderImage.cs" />
+    <Compile Include="Migrations\202511130716485_SliderImage.Designer.cs">
+      <DependentUpon>202511130716485_SliderImage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
@@ -172,6 +176,7 @@
     <Compile Include="Models\OrderDetail.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
+    <Compile Include="Models\SliderImage.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -196,6 +201,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Shopdunk.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -242,12 +248,16 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Admin\Users.cshtml" />
     <Content Include="Views\Admin\EditUser.cshtml" />
-    <Content Include="Views\Admin\ChangePassword.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Admin\Orders.cshtml" />
     <Content Include="Views\Admin\OrderDetails.cshtml" />
     <Content Include="Views\Product\Category.cshtml" />
+    <Content Include="Views\Admin\Sliders.cshtml" />
+    <Content Include="Views\Admin\EditSlider.cshtml" />
+    <Content Include="Views\Admin\CreateSlider.cshtml" />
+    <Content Include="Views\Admin\ChangeUserPassword.cshtml" />
+    <Content Include="Views\Product\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
@@ -270,6 +280,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202511110939190_AddOrderNavigationProperties.resx">
       <DependentUpon>202511110939190_AddOrderNavigationProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511130716485_SliderImage.resx">
+      <DependentUpon>202511130716485_SliderImage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

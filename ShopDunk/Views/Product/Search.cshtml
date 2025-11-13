@@ -1,0 +1,22 @@
+﻿@model List<ShopDunk.Models.Product>
+@{
+    ViewBag.Title = "Kết quả tìm kiếm cho '" + ViewBag.Query + "'";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Không tìm thấy sản phẩm nào phù hợp.</p>
+    }
+    else
+    {
+        foreach (var p in Model)
+        {
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", p)
+        }
+    }
+</div>

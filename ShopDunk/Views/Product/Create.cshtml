@@ -1,12 +1,11 @@
 ﻿@model ShopDunk.Models.Product
 @{
     ViewBag.Title = "Thêm sản phẩm";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Giả định bạn dùng Admin Layout
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin
 }
 
-@* --- SỬA LỖI: Đổi ValidationSummary(true) thành (false) để hiển thị tất cả lỗi --- *@
+@* Hiển thị tóm tắt lỗi (nếu có) *@
 @Html.ValidationSummary(false, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
-
 
 @using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -15,8 +14,16 @@
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Name, "Tên sản phẩm")
         @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-        @* --- SỬA LỖI: Thêm ValidationMessageFor --- *@
         @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        @Html.LabelFor(m => m.Category, "Danh mục")
+        @Html.DropDownListFor(m => m.Category,
+            new SelectList(new[] { "iPhone", "iPad", "Mac", "Watch", "Âm thanh", "Phụ kiện" }),
+            "Chọn danh mục",
+            new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mb-3">
@@ -27,30 +34,19 @@
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Price, "Giá")
         @Html.TextBoxFor(m => m.Price, new { @class = "form-control", type = "number", step = "0.01" })
-        @* --- SỬA LỖI: Thêm ValidationMessageFor --- *@
         @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Stock, "Số lượng tồn kho")
         @Html.TextBoxFor(m => m.Stock, new { @class = "form-control", type = "number" })
-        @* --- SỬA LỖI: Thêm ValidationMessageFor --- *@
         @Html.ValidationMessageFor(m => m.Stock, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mb-3">
-        @Html.LabelFor(m => m.Category, "Danh mục")
-        @* --- SỬA LỖI: Bổ sung thêm các danh mục khác --- *@
-        @Html.DropDownListFor(m => m.Category,
-            new SelectList(new[] { "iPhone", "iPad", "Mac"}),
-            "Chọn danh mục",
-            new { @class = "form-control" })
-        @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group mb-3">
         @Html.LabelFor(m => m.ImageFile, "Ảnh sản phẩm")
-        <input type="file" name="ImageFile" class="form-control" />
+        @Html.TextBoxFor(m => m.ImageFile, new { type = "file", @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ImageFile, "", new { @class = "text-danger" })
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">Thêm sản phẩm</button>

@@ -4,7 +4,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Mvc;
-using System.Data.Entity; // Cần thêm để dùng EntityState
+using System.Data.Entity;
+using System.Web;
+using System.Collections.Generic;
+using System.IO; // Thêm lại using này
 
 public class AdminController : Controller
 {
@@ -12,7 +15,6 @@ public class AdminController : Controller
 
     private bool IsAdmin()
     {
-        // Kiểm tra xem người dùng có đang đăng nhập và có Role là "Admin" hay không
         return Session["Role"]?.ToString() == "Admin";
     }
 
@@ -21,11 +23,10 @@ public class AdminController : Controller
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
 
-        // Thống kê cho dashboard
         ViewBag.TotalUsers = db.Users.Count();
         ViewBag.TotalProducts = db.Products.Count();
         ViewBag.TotalOrders = db.Orders.Count();
-        ViewBag.TotalRevenue = db.Orders.Where(o => o.Status == "Đã giao").Sum(o => (decimal?)o.TotalAmount) ?? 0; // Chỉ tính doanh thu đơn đã giao
+        ViewBag.TotalRevenue = db.Orders.Where(o => o.Status == "Đã giao").Sum(o => (decimal?)o.TotalAmount) ?? 0;
         ViewBag.PendingOrders = db.Orders.Count(o => o.Status == "Chờ xử lý");
 
         return View();
@@ -35,24 +36,21 @@ public class AdminController : Controller
     public ActionResult Products()
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
-        // Chức năng quản lý sản phẩm chi tiết nằm ở ProductController (Index, Create, Edit, Delete)
-        return RedirectToAction("Index", "Product"); // Chuyển hướng sang ProductController/Index
+        return RedirectToAction("Index", "Product");
     }
 
-    // Quản lý Đơn hàng (MỚI)
+    // Quản lý Đơn hàng
     public ActionResult Orders(string statusFilter, int page = 1, int pageSize = 10)
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
 
         var ordersQuery = db.Orders.Include(o => o.User).AsQueryable();
 
-        // Lọc theo trạng thái
         if (!string.IsNullOrEmpty(statusFilter))
         {
             ordersQuery = ordersQuery.Where(o => o.Status == statusFilter);
         }
 
-        // Phân trang
         int totalOrders = ordersQuery.Count();
         var orders = ordersQuery.OrderByDescending(o => o.OrderDate)
                                 .Skip((page - 1) * pageSize)
@@ -68,7 +66,7 @@ public class AdminController : Controller
         return View(orders);
     }
 
-    // Chi tiết đơn hàng (MỚI)
+    // Chi tiết đơn hàng
     public ActionResult OrderDetails(int id)
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
@@ -83,7 +81,7 @@ public class AdminController : Controller
         return View(order);
     }
 
-    // Cập nhật trạng thái đơn hàng (MỚI)
+    // Cập nhật trạng thái đơn hàng
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult UpdateOrderStatus(int orderID, string status)
@@ -109,18 +107,19 @@ public class AdminController : Controller
 
         var usersQuery = db.Users.AsQueryable();
 
-        // Tìm kiếm
         if (!string.IsNullOrEmpty(q))
         {
             usersQuery = usersQuery.Where(u => u.Username.Contains(q) || u.Email.Contains(q));
         }
 
-        // Phân trang
         int totalUsers = usersQuery.Count();
-        var users = usersQuery.OrderBy(u => u.UserID)
-                              .Skip((page - 1) * pageSize)
-                              .Take(pageSize)
-                              .ToList();
+
+        var users = usersQuery
+            .OrderByDescending(u => u.Role == "Admin") // Đưa Admin lên đầu
+            .ThenBy(u => u.UserID)                      // Sắp xếp phần còn lại theo ID
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
 
         ViewBag.CurrentPage = page;
         ViewBag.TotalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
@@ -137,14 +136,12 @@ public class AdminController : Controller
         var user = db.Users.Find(id);
         if (user == null) return HttpNotFound();
 
-        // Tạo ViewModel để tránh xung đột với các trường NotMapped (Password, ConfirmPassword)
         var model = new User
         {
             UserID = user.UserID,
             Username = user.Username,
             Email = user.Email,
             Role = user.Role,
-            // PasswordHash không cần thiết phải hiển thị/sửa trực tiếp
         };
 
         ViewBag.Roles = new SelectList(new[] { "Admin", "User" }, user.Role);
@@ -163,7 +160,6 @@ public class AdminController : Controller
             var user = db.Users.Find(model.UserID);
             if (user == null) return HttpNotFound();
 
-            // Cập nhật thông tin người dùng
             user.Username = model.Username;
             user.Email = model.Email;
             user.Role = model.Role;
@@ -179,50 +175,7 @@ public class AdminController : Controller
         return View(model);
     }
 
-    // GET: /Admin/ChangeUserPassword/5
-    public ActionResult ChangeUserPassword(int id)
-    {
-        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
-
-        var user = db.Users.Find(id);
-        if (user == null) return HttpNotFound();
-
-        var vm = new ChangePasswordViewModel { UserID = id };
-        ViewBag.Username = user.Username;
-
-        return View(vm);
-    }
-
-    // POST: /Admin/ChangeUserPassword/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult ChangeUserPassword(ChangePasswordViewModel model)
-    {
-        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
-
-        if (!ModelState.IsValid)
-        {
-            var user = db.Users.Find(model.UserID);
-            ViewBag.Username = user?.Username;
-            return View(model);
-        }
-
-        var targetUser = db.Users.Find(model.UserID);
-        if (targetUser == null) return HttpNotFound();
-
-        // Ngăn chặn Admin tự đổi mật khẩu cho mình thông qua trang này (nên dùng Account/ChangePassword)
-        if (targetUser.UserID == (int?)Session["UserID"])
-        {
-            TempData["Error"] = "Vui lòng dùng chức năng đổi mật khẩu cá nhân.";
-            return RedirectToAction("Users");
-        }
-
-        targetUser.PasswordHash = HashPassword(model.NewPassword);
-        db.SaveChanges();
-
-        TempData["Success"] = "Đổi mật khẩu thành công.";
-        return RedirectToAction("Users");
-    }
+    // *** ĐÃ XÓA 2 ACTION: ChangeUserPassword (GET VÀ POST) KHỎI ĐÂY ***
 
     // POST: /Admin/DeleteUser/5
     [HttpPost]
@@ -234,7 +187,6 @@ public class AdminController : Controller
         var user = db.Users.Find(id);
         if (user == null) return HttpNotFound();
 
-        // Ngăn chặn xóa tài khoản Admin đang đăng nhập
         var currentUsername = Session["Username"]?.ToString();
         if (string.Equals(currentUsername, user.Username, StringComparison.OrdinalIgnoreCase))
         {
@@ -248,7 +200,178 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    // Hàm băm mật khẩu (được copy từ AccountController)
+
+    #region Quản lý Slider
+
+    // (Các action Sliders, CreateSlider, EditSlider, DeleteSlider giữ nguyên...)
+
+    // GET: /Admin/Sliders
+    public ActionResult Sliders()
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+        ViewBag.Title = "Quản lý Slider";
+        var sliders = db.SliderImages.OrderBy(s => s.CategoryKey).ToList();
+        return View(sliders);
+    }
+
+    // GET: /Admin/CreateSlider
+    public ActionResult CreateSlider()
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+        ViewBag.Title = "Thêm Slider mới";
+        var model = new SliderImage();
+
+        ViewBag.ExistingKeys = db.SliderImages
+            .Select(s => s.CategoryKey)
+            .Distinct()
+            .ToList();
+
+        return View(model);
+    }
+
+    // POST: /Admin/CreateSlider
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult CreateSlider(SliderImage model)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+
+        try
+        {
+            if (model.ImageFile != null && model.ImageFile.ContentLength > 0)
+            {
+                string fileName = Path.GetFileName(model.ImageFile.FileName);
+                string extension = Path.GetExtension(fileName);
+                string newFileName = Guid.NewGuid().ToString() + extension;
+
+                string directoryPath = Server.MapPath("~/Images/Banners");
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                string path = Path.Combine(directoryPath, newFileName);
+                model.ImageFile.SaveAs(path);
+                model.ImageUrl = "/Images/Banners/" + newFileName;
+            }
+            else
+            {
+                ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh");
+            }
+
+            if (ModelState.IsValid)
+            {
+                db.SliderImages.Add(model);
+                db.SaveChanges();
+                TempData["Success"] = "Thêm slider thành công!";
+                return RedirectToAction("Sliders");
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", "Lỗi khi lưu: " + ex.Message);
+        }
+
+        ViewBag.Title = "Thêm Slider mới";
+        ViewBag.ExistingKeys = db.SliderImages.Select(s => s.CategoryKey).Distinct().ToList();
+        return View(model);
+    }
+
+    // GET: /Admin/EditSlider/5
+    public ActionResult EditSlider(int id)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+
+        var slider = db.SliderImages.Find(id);
+        if (slider == null) return HttpNotFound();
+
+        ViewBag.Title = "Sửa Slider";
+        ViewBag.ExistingKeys = db.SliderImages.Select(s => s.CategoryKey).Distinct().ToList();
+        return View(slider);
+    }
+
+    // POST: /Admin/EditSlider/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult EditSlider(SliderImage model)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+
+        try
+        {
+            if (model.ImageFile != null && model.ImageFile.ContentLength > 0)
+            {
+                var oldSlider = db.SliderImages.AsNoTracking().FirstOrDefault(s => s.SliderImageID == model.SliderImageID);
+                if (oldSlider != null && !string.IsNullOrEmpty(oldSlider.ImageUrl))
+                {
+                    string oldPath = Server.MapPath(oldSlider.ImageUrl);
+                    if (System.IO.File.Exists(oldPath))
+                    {
+                        System.IO.File.Delete(oldPath);
+                    }
+                }
+
+                string fileName = Path.GetFileName(model.ImageFile.FileName);
+                string extension = Path.GetExtension(fileName);
+                string newFileName = Guid.NewGuid().ToString() + extension;
+
+                string directoryPath = Server.MapPath("~/Images/Banners");
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                string path = Path.Combine(directoryPath, newFileName);
+                model.ImageFile.SaveAs(path);
+                model.ImageUrl = "/Images/Banners/" + newFileName;
+            }
+
+            if (ModelState.IsValid)
+            {
+                db.Entry(model).State = EntityState.Modified;
+                db.SaveChanges();
+                TempData["Success"] = "Cập nhật slider thành công!";
+                return RedirectToAction("Sliders");
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message);
+        }
+
+        ViewBag.Title = "Sửa Slider";
+        ViewBag.ExistingKeys = db.SliderImages.Select(s => s.CategoryKey).Distinct().ToList();
+        return View(model);
+    }
+
+    // POST: /Admin/DeleteSlider/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult DeleteSlider(int id)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+
+        var slider = db.SliderImages.Find(id);
+        if (slider == null) return HttpNotFound();
+
+        if (!string.IsNullOrEmpty(slider.ImageUrl))
+        {
+            string path = Server.MapPath(slider.ImageUrl);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+        }
+
+        db.SliderImages.Remove(slider);
+        db.SaveChanges();
+        TempData["Success"] = "Xóa slider thành công.";
+        return RedirectToAction("Sliders");
+    }
+
+    #endregion
+
+    // Hàm băm mật khẩu
     private string HashPassword(string password)
     {
         using (SHA256 sha = SHA256.Create())

@@ -1,5 +1,5 @@
 ﻿using System.Data.Entity;
-using ShopDunk.Models; // hoặc đúng namespace của các model như Product, User...
+using ShopDunk.Models;
 
 namespace ShopDunk.Models
 {
@@ -10,6 +10,9 @@ namespace ShopDunk.Models
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+
+        // --- THÊM DÒNG NÀY ---
+        public DbSet<SliderImage> SliderImages { get; set; }
 
         public AppDbContext() : base("DefaultConnection") { }
     }

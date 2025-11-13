@@ -1,80 +1,66 @@
 ﻿@{
     ViewBag.Title = "Dashboard";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin mới
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
-</div>
+@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại --- *@
+@*
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+    </div>
+*@
 
-<div class="row g-4">
-    <!-- Tổng doanh thu -->
+<div class="row g-3">
     <div class="col-md-6 col-lg-3">
-        <div class="card shadow-sm border-success">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="fs-1 text-success me-3">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title text-success">Tổng Doanh thu</h5>
-                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalRevenue.ToString("N0") ₫</p>
-                    </div>
+        <div class="card p-3 shadow-sm" style="border-left: 5px solid #198754;">
+            <div class="d-flex justify-content-between">
+                <div class="card-info">
+                    <h6 class="text-secondary text-uppercase">Tổng Doanh thu</h6>
+                    <h3 class="fw-bold">@ViewBag.TotalRevenue.ToString("N0") ₫</h3>
+                </div>
+                <div class="card-icon fs-2 text-success">
+                    <i class="fas fa-dollar-sign"></i>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Đơn hàng chờ xử lý -->
     <div class="col-md-6 col-lg-3">
-        <div class="card shadow-sm border-warning">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="fs-1 text-warning me-3">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title text-warning">Đơn chờ xử lý</h5>
-                        <p class="card-text fs-4 fw-bold">@ViewBag.PendingOrders</p>
-                    </div>
+        <div class="card p-3 shadow-sm" style="border-left: 5px solid #ffc107;">
+            <div class="d-flex justify-content-between">
+                <div class="card-info">
+                    <h6 class="text-secondary text-uppercase">Đơn chờ xử lý</h6>
+                    <h3 class="fw-bold">@ViewBag.PendingOrders</h3>
+                </div>
+                <div class="card-icon fs-2 text-warning">
+                    <i class="fas fa-clock"></i>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Tổng Sản phẩm -->
     <div class="col-md-6 col-lg-3">
-        <div class="card shadow-sm border-primary">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="fs-1 text-primary me-3">
-                        <i class="fas fa-box-open"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title text-primary">Tổng Sản phẩm</h5>
-                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalProducts</p>
-                    </div>
+        <div class="card p-3 shadow-sm" style="border-left: 5px solid #0d6efd;">
+            <div class="d-flex justify-content-between">
+                <div class="card-info">
+                    <h6 class="text-secondary text-uppercase">Tổng Sản phẩm</h6>
+                    <h3 class="fw-bold">@ViewBag.TotalProducts</h3>
+                </div>
+                <div class="card-icon fs-2 text-primary">
+                    <i class="fas fa-box-open"></i>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Tổng Người dùng -->
     <div class="col-md-6 col-lg-3">
-        <div class="card shadow-sm border-info">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="fs-1 text-info me-3">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title text-info">Người dùng</h5>
-                        <p class="card-text fs-4 fw-bold">@ViewBag.TotalUsers</p>
-                    </div>
+        <div class="card p-3 shadow-sm" style="border-left: 5px solid #0dcaf0;">
+            <div class="d-flex justify-content-between">
+                <div class="card-info">
+                    <h6 class="text-secondary text-uppercase">Người dùng</h6>
+                    <h3 class="fw-bold">@ViewBag.TotalUsers</h3>
+                </div>
+                <div class="card-icon fs-2 text-info">
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- (Tùy chọn: Thêm biểu đồ hoặc danh sách đơn hàng gần đây ở đây) -->
