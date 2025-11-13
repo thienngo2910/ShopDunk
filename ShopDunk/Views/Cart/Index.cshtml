@@ -1,8 +1,11 @@
 ﻿@model IEnumerable<ShopDunk.Models.CartItem>
 
 @{
-    <h2>Giỏ hàng của bạn</h2>
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<h2>Giỏ hàng của bạn</h2>
 
 <table class="table">
     <thead>
@@ -18,16 +21,23 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Product.Name</td>
-                <td>@item.Quantity</td>
+                <td class="align-middle">@item.Product.Name</td>
 
-                @* --- SỬA LỖI: Thêm 1 cặp ( ) bao quanh .ToString("N0") --- *@
-                <td>@((item.Product.Price).ToString("N0")) ₫</td>
+                @* --- BẮT ĐẦU CẬP NHẬT SỐ LƯỢNG --- *@
+                <td class="align-middle">
+                    <div class="input-group" style="width: 130px;">
+                        <a href="@Url.Action("DecreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary btn-sm">-</a>
+                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly />
+                        <a href="@Url.Action("IncreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary btn-sm">+</a>
+                    </div>
+                </td>
+                @* --- KẾT THÚC CẬP NHẬT SỐ LƯỢNG --- *@
 
-                @* Dòng này đã đúng, không cần sửa *@
-                <td>@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
+                <td class="align-middle">@((item.Product.Price).ToString("N0")) ₫</td>
 
-                <td>
+                <td class="align-middle">@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
+
+                <td class="align-middle">
                     <a href="/Cart/Remove/@item.CartItemID" class="btn btn-danger btn-sm">Xóa</a>
                 </td>
             </tr>

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic; // THÊM MỚI
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; // THÊM MỚI
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopDunk.Models
 {
@@ -14,18 +14,24 @@ namespace ShopDunk.Models
         public int UserID { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
-        public string Status { get; set; } // Ví dụ: "Chờ xử lý", "Đã giao", "Đã hủy"
+        public string Status { get; set; }
 
-        // --- BẮT ĐẦU SỬA LỖI ---
-        // Thêm các thuộc tính điều hướng (Navigation Properties)
-        // mà Entity Framework cần để liên kết các bảng.
+        // --- BẮT ĐẦU THÊM MỚI ---
+        [Required(ErrorMessage = "Vui lòng nhập địa chỉ giao hàng")]
+        [Display(Name = "Địa chỉ giao hàng")]
+        public string ShippingAddress { get; set; }
 
-        // Lỗi CS1061 (item.User) xảy ra vì thiếu thuộc tính này:
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
+        [Display(Name = "Số điện thoại")]
+        public string PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]
+        [Display(Name = "Phương thức thanh toán")]
+        public string PaymentMethod { get; set; }
+        // --- KẾT THÚC THÊM MỚI ---
+
         [ForeignKey("UserID")]
         public virtual User User { get; set; }
-
-        // Lỗi CS1061 (Model.OrderDetails) xảy ra vì thiếu thuộc tính này:
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        // --- KẾT THÚC SỬA LỖI ---
     }
 }

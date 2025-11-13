@@ -21,9 +21,8 @@ public class CartController : Controller
         return View(cartItems);
     }
 
-    // *** SỬA LỖI: Đổi tên tham số 'productId' thành 'id' ***
     // GET: /Cart/Add/id
-    public ActionResult Add(int id) // <-- ĐÃ SỬA TẠI ĐÂY
+    public ActionResult Add(int id)
     {
         if (Session["UserID"] == null)
         {
@@ -32,8 +31,6 @@ public class CartController : Controller
         }
 
         int userId = (int)Session["UserID"];
-
-        // *** SỬA LỖI: Dùng 'id' để tìm kiếm ***
         var item = db.CartItems.FirstOrDefault(c => c.ProductID == id && c.UserID == userId);
 
         if (item != null)
@@ -42,14 +39,53 @@ public class CartController : Controller
         }
         else
         {
-            // *** SỬA LỖI: Dùng 'id' để thêm mới ***
             db.CartItems.Add(new CartItem { ProductID = id, UserID = userId, Quantity = 1 });
         }
 
         db.SaveChanges();
         TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng.";
-        return RedirectToAction("Index", "Cart"); // Chuyển hướng về trang giỏ hàng
+        return RedirectToAction("Index", "Cart");
     }
+
+    // --- BẮT ĐẦU ACTION MỚI ---
+
+    // GET: /Cart/IncreaseQuantity/id (id ở đây là CartItemID)
+    public ActionResult IncreaseQuantity(int id)
+    {
+        if (Session["UserID"] == null) return RedirectToAction("Login", "Account");
+
+        var item = db.CartItems.Find(id);
+        if (item != null && item.UserID == (int)Session["UserID"])
+        {
+            item.Quantity++;
+            db.SaveChanges();
+        }
+        return RedirectToAction("Index");
+    }
+
+    // GET: /Cart/DecreaseQuantity/id (id ở đây là CartItemID)
+    public ActionResult DecreaseQuantity(int id)
+    {
+        if (Session["UserID"] == null) return RedirectToAction("Login", "Account");
+
+        var item = db.CartItems.Find(id);
+        if (item != null && item.UserID == (int)Session["UserID"])
+        {
+            item.Quantity--; // Giảm số lượng
+
+            if (item.Quantity <= 0)
+            {
+                // Nếu số lượng là 0, xóa luôn sản phẩm khỏi giỏ
+                db.CartItems.Remove(item);
+                TempData["Success"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
+            }
+            db.SaveChanges();
+        }
+        return RedirectToAction("Index");
+    }
+
+    // --- KẾT THÚC ACTION MỚI ---
+
 
     // GET: /Cart/Remove/id (CartItemID)
     public ActionResult Remove(int id)
@@ -62,7 +98,6 @@ public class CartController : Controller
         var item = db.CartItems.Find(id);
         if (item != null)
         {
-            // Đảm bảo chỉ người dùng sở hữu mới có thể xóa
             if (item.UserID == (int)Session["UserID"])
             {
                 db.CartItems.Remove(item);

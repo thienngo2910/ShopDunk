@@ -2,21 +2,26 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var existingKeys = (List<string>)ViewBag.ExistingKeys;
+    // ViewBag.Title đã được set trong AdminController
 }
 
-<h2>Sửa Slider</h2>
+@* --- SỬA LỖI 1: Xóa tiêu đề lặp lại --- *@
+@* <h2>Sửa Slider</h2> *@
 
 @using (Html.BeginForm("EditSlider", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.SliderImageID)
-    @Html.HiddenFor(m => m.ImageUrl) @* Giữ lại ảnh cũ nếu không upload file mới *@
-    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    @Html.HiddenFor(m => m.ImageUrl)
+
+    @* --- SỬA LỖI 2: Đổi "false" thành "true" để ẩn tóm tắt lỗi chung --- *@
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="mb-3">
         @Html.LabelFor(m => m.CategoryKey)
         @Html.TextBoxFor(m => m.CategoryKey, new { @class = "form-control", list = "category-keys" })
         @Html.ValidationMessageFor(m => m.CategoryKey, "", new { @class = "text-danger" })
+
         <datalist id="category-keys">
             @foreach (var key in existingKeys)
             {
@@ -25,6 +30,7 @@
         </datalist>
         <small class="form-text text-muted">Nhập 'Home' cho trang chủ, 'iPhone' cho trang iPhone, v.v.</small>
     </div>
+
 
     <div class="mb-3">
         <label>Ảnh hiện tại</label><br />
@@ -39,7 +45,8 @@
 
     <div class="mb-3">
         @Html.LabelFor(m => m.Title)
-        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+        @* --- SỬA LỖI 3: Đổi TextBoxFor thành TextAreaFor để xuống dòng --- *@
+        @Html.TextAreaFor(m => m.Title, new { @class = "form-control", rows = 3 })
     </div>
 
     <div class="mb-3 form-check">

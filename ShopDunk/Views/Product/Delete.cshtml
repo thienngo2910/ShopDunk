@@ -1,6 +1,7 @@
 ﻿@model ShopDunk.Models.Product
 @{
     ViewBag.Title = "Xóa sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Thêm layout Admin
 }
 
 <h3>Bạn có chắc muốn xóa sản phẩm này?</h3>
@@ -8,9 +9,10 @@
     <strong>@Model.Name</strong> - @Model.Price.ToString("N0") ₫
 </div>
 
-@using (Html.BeginForm("DeleteConfirmed", "Product", new { id = Model.ProductID }))
+@* --- SỬA LỖI: Đổi action từ "DeleteConfirmed" thành "Delete" --- *@
+@using (Html.BeginForm("Delete", "Product", new { id = Model.ProductID }, FormMethod.Post))
 {
     @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-danger mt-3">Xóa</button>
-    <a href="/Product/Index" class="btn btn-secondary mt-3">Hủy</a>
+    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary mt-3">Hủy</a>
 }

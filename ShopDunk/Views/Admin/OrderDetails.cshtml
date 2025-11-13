@@ -4,13 +4,20 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Chi tiết Đơn hàng #@Model.OrderID</h1>
+@* --- SỬA LỖI: Chuyển nút "Quay lại" vào section --- *@
+@section PageHeaderButtons {
     <a href="@Url.Action("Orders")" class="btn btn-sm btn-outline-secondary">Quay lại danh sách</a>
-</div>
+}
+
+@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại --- *@
+@*
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Chi tiết Đơn hàng #@Model.OrderID</h1>
+    </div>
+*@
+
 
 <div class="row g-4">
-    <!-- Thông tin đơn hàng -->
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-header">
@@ -48,7 +55,6 @@
         </div>
     </div>
 
-    <!-- Cập nhật trạng thái -->
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-header">
@@ -58,6 +64,13 @@
                 <p><strong>Khách hàng:</strong> @(Model.User?.Username ?? "[Đã xóa]")</p>
                 <p><strong>Email:</strong> @(Model.User?.Email ?? "N/A")</p>
                 <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+
+                @* --- THÊM MỚI THÔNG TIN GIAO HÀNG --- *@
+                <hr />
+                <p><strong>Số điện thoại:</strong> @Model.PhoneNumber</p>
+                <p><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                <p><strong>Thanh toán:</strong> @Model.PaymentMethod</p>
+                @* --- KẾT THÚC THÊM MỚI --- *@
 
                 <hr />
 

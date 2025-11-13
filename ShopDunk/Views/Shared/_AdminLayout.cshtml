@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,6 @@
     <style>
         body {
             padding-top: 56px;
-            background-color: #f8f9fa;
         }
 
         .navbar-dark .navbar-nav .nav-link.active {
@@ -38,6 +37,7 @@
                 ShopDunk Admin
             </a>
 
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -46,12 +46,15 @@
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
+
                         <a class="nav-link @(ViewBag.Title == "Dashboard" ? "active" : "")" href="@Url.Action("Index", "Admin")">
                             <i class="fas fa-tachometer-alt"></i>Dashboard
                         </a>
+
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewBag.Title.Contains("Đơn hàng") ? "active" : "")" href="@Url.Action("Orders", "Admin")">
+                        <a class="nav-link @(ViewBag.Title.Contains("Đơn hàng") ?
+"active" : "")" href="@Url.Action("Orders", "Admin")">
                             <i class="fas fa-file-invoice-dollar"></i>Đơn hàng
                         </a>
                     </li>
@@ -59,40 +62,50 @@
                         <a class="nav-link @(ViewBag.Title.Contains("Sản phẩm") ? "active" : "")" href="@Url.Action("Index", "Product")">
                             <i class="fas fa-box-open"></i>Sản phẩm
                         </a>
+
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewBag.Title.Contains("Người dùng") ? "active" : "")" href="@Url.Action("Users", "Admin")">
                             <i class="fas fa-users"></i>Người dùng
+
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewBag.Title.Contains("Slider") ? "active" : "")" href="@Url.Action("Sliders", "Admin")">
+
                             <i class="fas fa-images"></i>Quản lý Slider
                         </a>
                     </li>
                 </ul>
 
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav
+ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Home")" target="_blank">
-                            <i class="fas fa-store"></i>Trang bán hàng
+                        @* --- SỬA LỖI: Đã xóa "target=_blank" --- *@
+                        <a class="nav-link" href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-store"></i>Xem trang bán hàng
+
                         </a>
                     </li>
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
                             <i class="fas fa-user-circle"></i>Chào, <strong>@Session["Username"]</strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
+
                                 <a class="dropdown-item" href="@Url.Action("Logout", "Account")">
                                     <i class="fas fa-sign-out-alt"></i>Đăng xuất
                                 </a>
+
                             </li>
                         </ul>
                     </li>
                 </ul>
             </div>
+
         </div>
     </nav>
 
@@ -103,6 +116,7 @@
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 @TempData["Success"]
                 <button type"button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
             </div>
         }
         @if (TempData["Error"] != null)
@@ -111,15 +125,16 @@
                 @TempData["Error"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+
         }
 
-        @* --- SỬA LỖI: Thêm khu vực cho các nút bấm --- *@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">@ViewBag.Title</h1>
 
             <div class="btn-toolbar mb-2 mb-md-0">
                 @RenderSection("PageHeaderButtons", required: false)
             </div>
+
         </div>
 
         @RenderBody()

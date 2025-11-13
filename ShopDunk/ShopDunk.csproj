@@ -168,6 +168,10 @@
     <Compile Include="Migrations\202511130716485_SliderImage.Designer.cs">
       <DependentUpon>202511130716485_SliderImage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511131120484_AddShippingInfoToOrder.cs" />
+    <Compile Include="Migrations\202511131120484_AddShippingInfoToOrder.Designer.cs">
+      <DependentUpon>202511131120484_AddShippingInfoToOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
@@ -258,6 +262,7 @@
     <Content Include="Views\Admin\CreateSlider.cshtml" />
     <Content Include="Views\Admin\ChangeUserPassword.cshtml" />
     <Content Include="Views\Product\Search.cshtml" />
+    <Content Include="Views\Order\History.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
@@ -283,6 +288,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202511130716485_SliderImage.resx">
       <DependentUpon>202511130716485_SliderImage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511131120484_AddShippingInfoToOrder.resx">
+      <DependentUpon>202511131120484_AddShippingInfoToOrder.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

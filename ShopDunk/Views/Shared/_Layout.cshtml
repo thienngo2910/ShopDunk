@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
+@* <-- THÊM THUỘC TÍNH NÀY ĐỂ BẬT DARK MODE *@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +30,6 @@
                 </ul>
 
 
-                @* --- SỬA LỖI: Thêm method, action, và name="q" --- *@
                 <form class="d-flex ms-auto me-3 w-25" role="search" method="get" action="@Url.Action("Search", "Product")">
                     <input class="form-control" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search" name="q">
                 </form>
@@ -52,6 +52,9 @@
                                 {
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i> Trang Admin</a></li>
                                 }
+
+                                <li><a class="dropdown-item" href="@Url.Action("History", "Order")"><i class="fas fa-history me-2"></i> Lịch sử mua hàng</a></li>
+
                                 <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Account")"><i class="fas fa-key me-2"></i> Đổi mật khẩu</a></li>
                                 <li><a class="dropdown-item text-danger" href="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
                             </ul>
@@ -116,14 +119,14 @@
                     <h5>Liên hệ</h5>
                     <p>
                         <strong>Hotline:</strong> 1900.1234<br>
-                        <strong>Email:</strong> support@shopdunk.com<br>
+                        <strong>Email:</strong> support@thienstore.com<br>
                         <strong>Địa chỉ:</strong> 123 Nguyễn Văn Linh, Q.7, TP.HCM
                     </p>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>© 2025 ShopDunk Clone. All rights reserved.</p>
+                <p>© 2025 ThienStore Clone. All rights reserved.</p>
             </div>
         </div>
     </footer>

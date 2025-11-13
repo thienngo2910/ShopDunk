@@ -10,7 +10,8 @@
     @Html.HiddenFor(m => m.ProductID)
     @Html.HiddenFor(m => m.ImageUrl)
 
-    @Html.ValidationSummary(false, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
+    @* --- SỬA LỖI: Đổi "false" thành "true" để ẩn tóm tắt lỗi chung --- *@
+    @Html.ValidationSummary(true, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
 
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Name, "Tên sản phẩm")
@@ -27,8 +28,6 @@
         @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
     </div>
 
-    @* --- ĐÃ XÓA KHỐI ModelSeries KHỎI ĐÂY --- *@
-
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Description, "Mô tả")
         @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 4 })
@@ -37,7 +36,9 @@
 
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Price, "Giá")
-        @Html.TextBoxFor(m => m.Price, new { @class = "form-control", type = "number", step = "0.01" })
+
+        @Html.TextBoxFor(m => m.Price, new { @class = "form-control" })
+
         @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
     </div>
 
@@ -66,5 +67,5 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-    <a href="@Url.Action("Index")" class="btn btn-secondary">Hủy</a>
+    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Hủy</a>
 }

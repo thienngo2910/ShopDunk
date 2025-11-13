@@ -1,12 +1,26 @@
 ﻿@model ShopDunk.Models.Product
 
 <div class="col">
+    @* Thẻ card h-100 đã có position: relative từ file css (xem bước 2) *@
     <div class="card h-100 shadow-sm">
-        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" />
+
+        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://placehold.co/300x300/eee/ccc?text=N/A" : Model.ImageUrl)"
+             class="card-img-top"
+             alt="@Model.Name"
+             style="height: 300px; object-fit: cover;" />
+
         <div class="card-body text-center">
-            <h5 class="card-title">@Model.Name</h5>
+            @* Thêm class "text-decoration-none" để tên sản phẩm không bị gạch chân *@
+            <h5 class="card-title text-decoration-none">@Model.Name</h5>
             <p class="text-primary fw-bold">@Model.Price.ToString("N0") ₫</p>
-            <a href="/Product/Details/@Model.ProductID" class="btn btn-outline-primary btn-sm w-100">Xem chi tiết</a>
+
+            @* THÊM CLASS "stretched-link" VÀO ĐÂY:
+                Class này sẽ "kéo dãn" link này ra toàn bộ thẻ .card cha
+            *@
+            <a href="/Product/Details/@Model.ProductID"
+               class="btn btn-outline-primary btn-sm w-100 stretched-link">
+                Xem chi tiết
+            </a>
         </div>
     </div>
 </div>

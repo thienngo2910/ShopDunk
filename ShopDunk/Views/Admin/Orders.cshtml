@@ -8,13 +8,6 @@
     string statusFilter = ViewBag.StatusFilter;
 }
 
-@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại --- *@
-@*
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Quản lý Đơn hàng</h1>
-    </div>
-*@
-
 <form method="get" class="row g-3 mb-3">
     <div class="col-md-4">
         @Html.DropDownList("statusFilter", (SelectList)ViewBag.StatusList, "Tất cả trạng thái", new { @class = "form-select" })
@@ -53,7 +46,8 @@
                         </span>
                     </td>
                     <td>
-                        <a href="@Url.Action("OrderDetails", new { id = item.OrderID })" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                        @* --- SỬA LỖI: Đảm bảo link này gửi đúng "id" --- *@
+                        <a href="@Url.Action("OrderDetails", "Admin", new { id = item.OrderID })" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
                     </td>
                 </tr>
             }
