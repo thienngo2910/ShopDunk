@@ -56,6 +56,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -172,6 +174,10 @@
     <Compile Include="Migrations\202511131120484_AddShippingInfoToOrder.Designer.cs">
       <DependentUpon>202511131120484_AddShippingInfoToOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511140335175_AddProductReviews.cs" />
+    <Compile Include="Migrations\202511140335175_AddProductReviews.Designer.cs">
+      <DependentUpon>202511140335175_AddProductReviews.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
@@ -179,6 +185,7 @@
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderDetail.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ProductReview.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\SliderImage.cs" />
     <Compile Include="Models\User.cs" />
@@ -292,6 +299,9 @@
     <EmbeddedResource Include="Migrations\202511131120484_AddShippingInfoToOrder.resx">
       <DependentUpon>202511131120484_AddShippingInfoToOrder.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511140335175_AddProductReviews.resx">
+      <DependentUpon>202511140335175_AddProductReviews.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -322,6 +332,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\Products\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

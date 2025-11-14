@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using System.Web;
 using System.Collections.Generic;
-using System.IO; // Thêm lại using này
+using System.IO;
 
 public class AdminController : Controller
 {
@@ -18,6 +18,8 @@ public class AdminController : Controller
         return Session["Role"]?.ToString() == "Admin";
     }
 
+    // (Giữ nguyên các action: Index, Products, Orders, OrderDetails, UpdateOrderStatus, Users, EditUser, DeleteUser)
+    // ...
     // Trang chủ Admin (Dashboard)
     public ActionResult Index()
     {
@@ -115,8 +117,8 @@ public class AdminController : Controller
         int totalUsers = usersQuery.Count();
 
         var users = usersQuery
-            .OrderByDescending(u => u.Role == "Admin") // Đưa Admin lên đầu
-            .ThenBy(u => u.UserID)                      // Sắp xếp phần còn lại theo ID
+            .OrderByDescending(u => u.Role == "Admin")
+            .ThenBy(u => u.UserID)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
@@ -175,8 +177,6 @@ public class AdminController : Controller
         return View(model);
     }
 
-    // *** ĐÃ XÓA 2 ACTION: ChangeUserPassword (GET VÀ POST) KHỎI ĐÂY ***
-
     // POST: /Admin/DeleteUser/5
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -203,16 +203,34 @@ public class AdminController : Controller
 
     #region Quản lý Slider
 
-    // (Các action Sliders, CreateSlider, EditSlider, DeleteSlider giữ nguyên...)
-
+    // --- BẮT ĐẦU CẬP NHẬT (Thêm filterKey) ---
     // GET: /Admin/Sliders
-    public ActionResult Sliders()
+    public ActionResult Sliders(string filterKey = "all")
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
         ViewBag.Title = "Quản lý Slider";
-        var sliders = db.SliderImages.OrderBy(s => s.CategoryKey).ToList();
+
+        // Lấy danh sách Key để tạo dropdown bộ lọc
+        var allKeys = db.SliderImages
+            .Select(s => s.CategoryKey)
+            .Distinct()
+            .ToList();
+
+        // Gửi SelectList và giá trị đang lọc về View
+        ViewBag.CategoryKeys = new SelectList(allKeys, filterKey);
+        ViewBag.CurrentFilter = filterKey;
+
+        // Lọc danh sách slider
+        var slidersQuery = db.SliderImages.AsQueryable();
+        if (filterKey != "all" && !string.IsNullOrEmpty(filterKey))
+        {
+            slidersQuery = slidersQuery.Where(s => s.CategoryKey == filterKey);
+        }
+
+        var sliders = slidersQuery.OrderBy(s => s.CategoryKey).ToList();
         return View(sliders);
     }
+    // --- KẾT THÚC CẬP NHẬT ---
 
     // GET: /Admin/CreateSlider
     public ActionResult CreateSlider()
@@ -236,46 +254,61 @@ public class AdminController : Controller
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
 
-        try
+        if (model.ImageFiles == null || !model.ImageFiles.Any(f => f != null && f.ContentLength > 0))
         {
-            if (model.ImageFile != null && model.ImageFile.ContentLength > 0)
-            {
-                string fileName = Path.GetFileName(model.ImageFile.FileName);
-                string extension = Path.GetExtension(fileName);
-                string newFileName = Guid.NewGuid().ToString() + extension;
+            ModelState.AddModelError("ImageFiles", "Vui lòng chọn ít nhất một ảnh.");
+        }
 
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                int successfulUploads = 0;
                 string directoryPath = Server.MapPath("~/Images/Banners");
                 if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                string path = Path.Combine(directoryPath, newFileName);
-                model.ImageFile.SaveAs(path);
-                model.ImageUrl = "/Images/Banners/" + newFileName;
-            }
-            else
-            {
-                ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh");
-            }
+                foreach (var file in model.ImageFiles)
+                {
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileName(file.FileName);
+                        string extension = Path.GetExtension(fileName);
+                        string newFileName = Guid.NewGuid().ToString() + extension;
+                        string path = Path.Combine(directoryPath, newFileName);
 
-            if (ModelState.IsValid)
-            {
-                db.SliderImages.Add(model);
+                        file.SaveAs(path);
+
+                        var newSlider = new SliderImage
+                        {
+                            CategoryKey = model.CategoryKey,
+                            Title = model.Title,
+                            IsActive = model.IsActive,
+                            ImageUrl = "/Images/Banners/" + newFileName
+                        };
+
+                        db.SliderImages.Add(newSlider);
+                        successfulUploads++;
+                    }
+                }
+
                 db.SaveChanges();
-                TempData["Success"] = "Thêm slider thành công!";
+                TempData["Success"] = $"Đã thêm {successfulUploads} slider thành công!";
                 return RedirectToAction("Sliders");
             }
-        }
-        catch (Exception ex)
-        {
-            ModelState.AddModelError("", "Lỗi khi lưu: " + ex.Message);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi lưu: " + ex.Message);
+            }
         }
 
         ViewBag.Title = "Thêm Slider mới";
         ViewBag.ExistingKeys = db.SliderImages.Select(s => s.CategoryKey).Distinct().ToList();
         return View(model);
     }
+
 
     // GET: /Admin/EditSlider/5
     public ActionResult EditSlider(int id)
@@ -299,7 +332,9 @@ public class AdminController : Controller
 
         try
         {
-            if (model.ImageFile != null && model.ImageFile.ContentLength > 0)
+            var newImageFile = model.ImageFiles?.FirstOrDefault();
+
+            if (newImageFile != null && newImageFile.ContentLength > 0)
             {
                 var oldSlider = db.SliderImages.AsNoTracking().FirstOrDefault(s => s.SliderImageID == model.SliderImageID);
                 if (oldSlider != null && !string.IsNullOrEmpty(oldSlider.ImageUrl))
@@ -311,7 +346,7 @@ public class AdminController : Controller
                     }
                 }
 
-                string fileName = Path.GetFileName(model.ImageFile.FileName);
+                string fileName = Path.GetFileName(newImageFile.FileName);
                 string extension = Path.GetExtension(fileName);
                 string newFileName = Guid.NewGuid().ToString() + extension;
 
@@ -322,7 +357,7 @@ public class AdminController : Controller
                 }
 
                 string path = Path.Combine(directoryPath, newFileName);
-                model.ImageFile.SaveAs(path);
+                newImageFile.SaveAs(path);
                 model.ImageUrl = "/Images/Banners/" + newFileName;
             }
 

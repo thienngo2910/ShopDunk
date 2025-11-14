@@ -6,7 +6,6 @@
 
 <h2>Thanh toán</h2>
 
-@* Bắt đầu form, bao bọc TOÀN BỘ trang *@
 @using (Html.BeginForm("PlaceOrder", "Order", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
@@ -26,6 +25,10 @@
                 <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" required />
             </div>
 
+            <div class="mb-3">
+                <label for="note" class="form-label">Ghi chú (Tùy chọn)</label>
+                <textarea id="note" name="note" class="form-control" rows="3" placeholder="Ghi chú cho người giao hàng..."></textarea>
+            </div>
             <h4>Phương thức thanh toán</h4>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCod" value="COD" checked required>
@@ -40,7 +43,6 @@
                 </label>
             </div>
 
-            @* Hiển thị lỗi (nếu có) *@
             @Html.ValidationSummary(false, "", new { @class = "text-danger mt-3" })
             @if (TempData["Error"] != null)
             {

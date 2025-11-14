@@ -5,7 +5,6 @@
     // ViewBag.Title đã được set trong AdminController
 }
 
-@* --- SỬA LỖI 1: Xóa tiêu đề lặp lại --- *@
 @* <h2>Sửa Slider</h2> *@
 
 @using (Html.BeginForm("EditSlider", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -14,7 +13,6 @@
     @Html.HiddenFor(m => m.SliderImageID)
     @Html.HiddenFor(m => m.ImageUrl)
 
-    @* --- SỬA LỖI 2: Đổi "false" thành "true" để ẩn tóm tắt lỗi chung --- *@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="mb-3">
@@ -38,14 +36,14 @@
     </div>
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.ImageFile, "Tải ảnh mới (để trống nếu không muốn thay đổi)")
-        @Html.TextBoxFor(m => m.ImageFile, new { type = "file", @class = "form-control" })
-        @Html.ValidationMessageFor(m => m.ImageFile, "", new { @class = "text-danger" })
+        @* --- SỬA LỖI: Đổi "ImageFile" thành "ImageFiles" --- *@
+        @Html.LabelFor(m => m.ImageFiles, "Tải ảnh mới (để trống nếu không muốn thay đổi)")
+        @Html.TextBoxFor(m => m.ImageFiles, new { type = "file", @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.ImageFiles, "", new { @class = "text-danger" })
     </div>
 
     <div class="mb-3">
         @Html.LabelFor(m => m.Title)
-        @* --- SỬA LỖI 3: Đổi TextBoxFor thành TextAreaFor để xuống dòng --- *@
         @Html.TextAreaFor(m => m.Title, new { @class = "form-control", rows = 3 })
     </div>
 

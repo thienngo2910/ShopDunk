@@ -13,6 +13,7 @@ namespace ShopDunk.Models
 
         // --- THÊM DÒNG NÀY ---
         public DbSet<SliderImage> SliderImages { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
         public AppDbContext() : base("DefaultConnection") { }
     }

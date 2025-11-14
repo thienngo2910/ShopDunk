@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic; // <-- THÊM DÒNG NÀY
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
 
@@ -23,7 +24,8 @@ namespace ShopDunk.Models
         public bool IsActive { get; set; } = true;
 
         [NotMapped]
-        [Display(Name = "Tải ảnh mới")]
-        public HttpPostedFileBase ImageFile { get; set; }
+        [Display(Name = "Tải ảnh mới (Có thể chọn nhiều ảnh)")]
+        // --- SỬA LỖI: Đổi từ 1 file sang danh sách file ---
+        public IEnumerable<HttpPostedFileBase> ImageFiles { get; set; }
     }
 }

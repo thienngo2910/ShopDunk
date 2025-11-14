@@ -16,7 +16,6 @@ namespace ShopDunk.Models
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }
 
-        // --- BẮT ĐẦU THÊM MỚI ---
         [Required(ErrorMessage = "Vui lòng nhập địa chỉ giao hàng")]
         [Display(Name = "Địa chỉ giao hàng")]
         public string ShippingAddress { get; set; }
@@ -28,6 +27,11 @@ namespace ShopDunk.Models
         [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]
         [Display(Name = "Phương thức thanh toán")]
         public string PaymentMethod { get; set; }
+
+        // --- THÊM DÒNG NÀY ---
+        [Display(Name = "Ghi chú đơn hàng")]
+        [DataType(DataType.MultilineText)]
+        public string Note { get; set; } // Trường mới để lưu ghi chú
         // --- KẾT THÚC THÊM MỚI ---
 
         [ForeignKey("UserID")]

@@ -10,11 +10,19 @@ public class AccountController : Controller
 {
     private AppDbContext db = new AppDbContext();
 
-    public ActionResult Login() => View();
+    // --- CẬP NHẬT (Thêm returnUrl) ---
+    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
+    public ActionResult Login(string returnUrl)
+    {
+        // Gửi returnUrl này đến View để Form có thể POST ngược lại
+        ViewBag.ReturnUrl = returnUrl;
+        return View();
+    }
 
+    // --- CẬP NHẬT (Thêm returnUrl) ---
     [HttpPost]
-    [ValidateAntiForgeryToken] // Thêm AntiForgeryToken
-    public ActionResult Login(string username, string password)
+    [ValidateAntiForgeryToken]
+    public ActionResult Login(string username, string password, string returnUrl)
     {
         username = username.Trim();
         string hash = HashPassword(password);
@@ -27,13 +35,27 @@ public class AccountController : Controller
             Session["UserID"] = user.UserID;
             Session["Username"] = user.Username;
             Session["Role"] = user.Role;
-            return RedirectToAction("Index", "Home");
+
+            // --- LOGIC CHUYỂN HƯỚNG MỚI ---
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                // Nếu có returnUrl hợp lệ, trả về trang đó
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                // Nếu không, về trang chủ
+                return RedirectToAction("Index", "Home");
+            }
+            // --- KẾT THÚC LOGIC MỚI ---
         }
 
         ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
+        ViewBag.ReturnUrl = returnUrl; // Gửi lại returnUrl nếu đăng nhập thất bại
         return View();
     }
 
+    // (Giữ nguyên các Action: Logout, Register...)
     public ActionResult Logout()
     {
         FormsAuthentication.SignOut();
@@ -41,6 +63,7 @@ public class AccountController : Controller
         return RedirectToAction("Login");
     }
 
+    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
     public ActionResult Register() => View();
 
     [HttpPost]
@@ -56,13 +79,12 @@ public class AccountController : Controller
                 return View(model);
             }
 
-            // Tạo User mới từ ViewModel
             var newUser = new User
             {
                 Username = model.Username,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                Role = "User" // Mặc định là User
+                Role = "User"
             };
 
             db.Users.Add(newUser);
@@ -75,8 +97,10 @@ public class AccountController : Controller
         return View(model);
     }
 
+    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
     public ActionResult AccessDenied() => View();
 
+    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
     public ActionResult ChangePassword()
     {
         if (Session["UserID"] == null)

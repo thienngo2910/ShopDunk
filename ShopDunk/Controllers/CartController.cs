@@ -13,7 +13,8 @@ public class CartController : Controller
         if (Session["UserID"] == null)
         {
             TempData["Error"] = "Vui lòng đăng nhập để xem giỏ hàng.";
-            return RedirectToAction("Login", "Account");
+            // --- CẬP NHẬT: Gửi kèm returnUrl ---
+            return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Cart") });
         }
 
         int userId = (int)Session["UserID"];
@@ -27,7 +28,8 @@ public class CartController : Controller
         if (Session["UserID"] == null)
         {
             TempData["Error"] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.";
-            return RedirectToAction("Login", "Account");
+            // --- CẬP NHẬT: Gửi kèm returnUrl (trang trước đó) ---
+            return RedirectToAction("Login", "Account", new { returnUrl = Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Home") });
         }
 
         int userId = (int)Session["UserID"];
@@ -47,8 +49,8 @@ public class CartController : Controller
         return RedirectToAction("Index", "Cart");
     }
 
-    // --- BẮT ĐẦU ACTION MỚI ---
-
+    // (Giữ nguyên các Action: IncreaseQuantity, DecreaseQuantity, Remove, Dispose)
+    // ...
     // GET: /Cart/IncreaseQuantity/id (id ở đây là CartItemID)
     public ActionResult IncreaseQuantity(int id)
     {
@@ -71,11 +73,10 @@ public class CartController : Controller
         var item = db.CartItems.Find(id);
         if (item != null && item.UserID == (int)Session["UserID"])
         {
-            item.Quantity--; // Giảm số lượng
+            item.Quantity--;
 
             if (item.Quantity <= 0)
             {
-                // Nếu số lượng là 0, xóa luôn sản phẩm khỏi giỏ
                 db.CartItems.Remove(item);
                 TempData["Success"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
             }
@@ -83,9 +84,6 @@ public class CartController : Controller
         }
         return RedirectToAction("Index");
     }
-
-    // --- KẾT THÚC ACTION MỚI ---
-
 
     // GET: /Cart/Remove/id (CartItemID)
     public ActionResult Remove(int id)

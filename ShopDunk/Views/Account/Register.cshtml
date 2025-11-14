@@ -1,6 +1,7 @@
 ﻿@model ShopDunk.Models.RegisterViewModel
 @{
     ViewBag.Title = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Đăng ký tài khoản</h2>
@@ -38,3 +39,4 @@
 
     @Html.Raw(ViewBag.Error != null ? $"<div class=\"text-danger mt-3\">{ViewBag.Error}</div>" : "")
 }
+@* --- SỬA LỖI: Đã xóa dấu '}' thừa ở đây --- *@

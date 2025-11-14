@@ -1,7 +1,7 @@
 ﻿@model ShopDunk.Models.User
 @{
     ViewBag.Title = "Đăng nhập";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // <-- DÒNG NÀY RẤT QUAN TRỌNG
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Đăng nhập</h2>
@@ -11,7 +11,7 @@
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
-@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -31,5 +31,7 @@
 }
 
 <p class="mt-3">
-    Chưa có tài khoản? <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
+    Chưa có tài khoản?
+    <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
 </p>
+@* --- SỬA LỖI: Đã xóa dấu '}' thừa ở đây --- *@

@@ -26,10 +26,10 @@ body {
 h1, h2, h3, h4, h5, h6 {
     color: var(--text-light);
 }
-    /* --- SỬA LỖI: Phóng to đề mục --- */
+
     h2.category-title {
         color: var(--text-light);
-        font-size: 2.2rem; /* Phóng to */
+        font-size: 2.2rem;
         font-weight: 600;
     }
 
@@ -200,7 +200,7 @@ a {
 }
 
 
-/* 9. Nút "Xem tất cả" (Cũ) */
+/* 9. Nút "Xem tất cả" (Trang chủ) */
 .category-section .btn-outline-primary {
     border-color: var(--accent-gold) !important;
     color: var(--accent-gold) !important;
@@ -238,6 +238,8 @@ form.d-flex .form-label {
 }
 
 /* 12. TÙY CHỈNH MÀU NÚT (Đồng bộ) */
+
+/* Nút chính (Vàng) */
 .btn-primary {
     background-color: transparent;
     border-color: var(--accent-gold);
@@ -256,6 +258,8 @@ form.d-flex .form-label {
         box-shadow: 0 0 0 0.25rem rgba(240, 185, 11, 0.25);
     }
 
+
+/* Nút thành công (Vàng) */
 .btn-success {
     background-color: transparent;
     border-color: var(--accent-gold);
@@ -274,6 +278,7 @@ form.d-flex .form-label {
         box-shadow: 0 0 0 0.25rem rgba(240, 185, 11, 0.25);
     }
 
+/* Nút nguy hiểm (Đỏ) */
 .btn-danger {
     background-color: var(--accent-red);
     border-color: var(--accent-red);
@@ -291,6 +296,7 @@ form.d-flex .form-label {
         box-shadow: 0 0 0 0.25rem rgba(215, 0, 21, 0.5);
     }
 
+/* Nút viền chính (Vàng) */
 .btn-outline-primary {
     border-color: var(--accent-gold);
     color: var(--accent-gold);
@@ -326,15 +332,56 @@ form.d-flex .form-label {
         box-shadow: 0 0 0 0.25rem rgba(240, 185, 11, 0.25);
     }
 
-/* 13. CĂN CHỈNH TIÊU ĐỀ TRANG CHỦ (THÊM MỚI) */
+/* 13. CĂN CHỈNH TIÊU ĐỀ TRANG CHỦ */
 .category-header {
-    position: relative; /* Làm container */
-    padding-bottom: 0.5rem; /* Thêm khoảng đệm dưới */
+    position: relative;
+    padding-bottom: 0.5rem;
 }
 
     .category-header .view-all-link {
         position: absolute;
-        top: 50%; /* Căn giữa theo chiều dọc */
+        top: 50%;
         right: 0;
-        transform: translateY(-50%); /* Tinh chỉnh căn giữa */
+        transform: translateY(-50%);
     }
+
+/* 14. SỬA LỖI ICON SLIDER MÀU ĐEN */
+.carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+.carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+/* 15. CSS CHO HỆ THỐNG SAO ĐÁNH GIÁ (MỚI) */
+.star-rating-display i {
+    font-size: 1.1rem;
+}
+
+.star-rating-display .text-warning {
+    color: var(--accent-gold) !important;
+}
+
+.star-rating-input {
+    display: inline-block;
+    direction: rtl; /* Đảo ngược để sao đầu tiên là 5 sao */
+}
+
+    .star-rating-input label {
+        font-size: 2rem;
+        color: var(--border-color);
+        cursor: pointer;
+        padding: 0 0.1em;
+        transition: color 0.2s ease;
+    }
+
+    .star-rating-input input {
+        display: none; /* Ẩn radio button */
+    }
+        /* Khi hover vào, tất cả sao đằng trước nó sẽ sáng lên */
+        .star-rating-input label:hover,
+        .star-rating-input label:hover ~ label,
+        .star-rating-input input:checked ~ label {
+            color: var(--accent-gold);
+        }

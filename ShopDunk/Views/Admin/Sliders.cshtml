@@ -4,7 +4,6 @@
     // ViewBag.Title đã được set trong AdminController
 }
 
-@* --- SỬA LỖI: Chuyển nút "Thêm Slider" vào section mới --- *@
 @section PageHeaderButtons {
     <a href="@Url.Action("CreateSlider")" class="btn btn-sm btn-primary">
         <i class="fas fa-plus me-1"></i>
@@ -12,15 +11,15 @@
     </a>
 }
 
-@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại (đã chuyển nút lên trên) --- *@
-@*
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>Quản lý Slider</h2>
-        <a href="@Url.Action("CreateSlider")" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Thêm Slider mới
-        </a>
+@* --- THÊM MỚI FORM BỘ LỌC --- *@
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+        @Html.Label("filterKey", "Lọc theo trang:", new { @class = "form-label" })
+        @Html.DropDownList("filterKey", (SelectList)ViewBag.CategoryKeys, "Tất cả các trang", new { @class = "form-select", onchange = "this.form.submit();" })
     </div>
-*@
+</form>
+@* --- KẾT THÚC THÊM MỚI --- *@
+
 
 <table class="table table-striped table-hover mt-3">
     <thead>

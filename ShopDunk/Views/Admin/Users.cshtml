@@ -1,12 +1,26 @@
 ﻿@model IEnumerable<ShopDunk.Models.User>
 @{
     ViewBag.Title = "Quản lý Người dùng";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin
 
+    // Lấy các giá trị đã được gửi từ AdminController
     int page = ViewBag.CurrentPage ?? 1;
     string q = ViewBag.Query ?? "";
     int totalPages = ViewBag.TotalPages;
+
+    /* --- SỬA LỖI ---
+        Đã xóa bỏ toàn bộ khối "try...catch" (gây ra lỗi ở Ligne 14)
+        vì nó cố gắng truy cập 'db' từ View.
+        Các giá trị 'page' và 'totalPages' đã được Controller cung cấp.
+    */
 }
+
+@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại --- *@
+@*
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Quản lý Người dùng</h1>
+    </div>
+*@
 
 <form method="get" class="row g-3 mb-3">
     <div class="col-md-6">
@@ -41,7 +55,7 @@
                     <td>
                         <a class="btn btn-sm btn-outline-primary" href="@Url.Action("EditUser", "Admin", new { id = u.UserID })">Sửa</a>
 
-                        @* --- SỬA LỖI: Đã xóa nút "Đổi MK" khỏi đây --- *@
+                        @* Nút đổi MK đã bị xóa theo yêu cầu *@
 
                         @using (Html.BeginForm("DeleteUser", "Admin", new { id = u.UserID }, FormMethod.Post, new { @class = "d-inline", onsubmit = "return confirm('Bạn có chắc muốn xóa người dùng này?');" }))
                         {

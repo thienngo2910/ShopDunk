@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; // <-- Đảm bảo có using này
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -30,8 +30,10 @@ namespace ShopDunk.Models
 
         public string Category { get; set; }
 
-        // Không lưu vào DB, dùng để nhận file khi upload
         [NotMapped]
         public HttpPostedFileBase ImageFile { get; set; }
+
+        // --- THÊM DÒNG NÀY ---
+        public virtual ICollection<ProductReview> Reviews { get; set; }
     }
 }
