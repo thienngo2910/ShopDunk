@@ -28,7 +28,7 @@
                         @foreach (var item in Model.OrderDetails)
                         {
                             <tr>
-                                <td>@(item.Product?.Name ?? "[Sản phẩm đã xóa]")</td>
+                                <td>@(item.Product?.Name ?? "[Sản phẩm đã xóa]") - @item.Color - @item.Storage</td>
                                 <td>@item.Quantity</td>
                                 <td>@item.UnitPrice.ToString("N0") ₫</td>
                                 <td>@((item.Quantity * item.UnitPrice).ToString("N0")) ₫</td>

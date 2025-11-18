@@ -4,8 +4,8 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Sử dụng layout Admin
 }
 
-@* Hiển thị tóm tắt lỗi (nếu có) *@
-@Html.ValidationSummary(false, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
+@* --- SỬA LỖI: Đổi "false" thành "true" để ẩn tóm tắt lỗi chung --- *@
+@Html.ValidationSummary(true, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
 
 @using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {

@@ -178,6 +178,22 @@
     <Compile Include="Migrations\202511140335175_AddProductReviews.Designer.cs">
       <DependentUpon>202511140335175_AddProductReviews.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202511181626185_InitCreate.cs" />
+    <Compile Include="Migrations\202511181626185_InitCreate.Designer.cs">
+      <DependentUpon>202511181626185_InitCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511181703597_SaveImagesToDB.cs" />
+    <Compile Include="Migrations\202511181703597_SaveImagesToDB.Designer.cs">
+      <DependentUpon>202511181703597_SaveImagesToDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511181826166_UpdateImageSchema_Final.cs" />
+    <Compile Include="Migrations\202511181826166_UpdateImageSchema_Final.Designer.cs">
+      <DependentUpon>202511181826166_UpdateImageSchema_Final.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511181858395_AddProductVariants.cs" />
+    <Compile Include="Migrations\202511181858395_AddProductVariants.Designer.cs">
+      <DependentUpon>202511181858395_AddProductVariants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AppDbContext.cs" />
     <Compile Include="Models\CartItem.cs" />
@@ -186,16 +202,13 @@
     <Compile Include="Models\OrderDetail.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductReview.cs" />
+    <Compile Include="Models\ProductVariant.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\SliderImage.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\ShopDunk.mdf" />
-    <Content Include="App_Data\ShopDunk_log.ldf">
-      <DependentUpon>ShopDunk.mdf</DependentUpon>
-    </Content>
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -270,6 +283,7 @@
     <Content Include="Views\Admin\ChangeUserPassword.cshtml" />
     <Content Include="Views\Product\Search.cshtml" />
     <Content Include="Views\Order\History.cshtml" />
+    <Content Include="Views\Product\ManageVariants.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202511070715548_InitialCreate.resx">
@@ -302,6 +316,18 @@
     <EmbeddedResource Include="Migrations\202511140335175_AddProductReviews.resx">
       <DependentUpon>202511140335175_AddProductReviews.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511181626185_InitCreate.resx">
+      <DependentUpon>202511181626185_InitCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511181703597_SaveImagesToDB.resx">
+      <DependentUpon>202511181703597_SaveImagesToDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511181826166_UpdateImageSchema_Final.resx">
+      <DependentUpon>202511181826166_UpdateImageSchema_Final.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511181858395_AddProductVariants.resx">
+      <DependentUpon>202511181858395_AddProductVariants.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -331,7 +357,7 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\Products\" />
+    <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

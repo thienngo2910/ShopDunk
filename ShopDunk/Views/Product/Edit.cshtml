@@ -8,9 +8,8 @@
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.ProductID)
-    @Html.HiddenFor(m => m.ImageUrl)
+    @* SỬA LỖI: Đã xóa dòng HiddenFor ImageUrl *@
 
-    @* --- SỬA LỖI: Đổi "false" thành "true" để ẩn tóm tắt lỗi chung --- *@
     @Html.ValidationSummary(true, "Vui lòng kiểm tra lại các lỗi sau:", new { @class = "text-danger" })
 
     <div class="form-group mb-3">
@@ -36,9 +35,7 @@
 
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.Price, "Giá")
-
         @Html.TextBoxFor(m => m.Price, new { @class = "form-control" })
-
         @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
     </div>
 
@@ -50,9 +47,10 @@
 
     <div class="form-group mb-3">
         <label>Ảnh hiện tại</label><br />
-        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        @* SỬA LỖI: Dùng ImageBase64 *@
+        @if (!string.IsNullOrEmpty(Model.ImageBase64))
         {
-            <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 200px; max-height: 200px;" class="mb-2" />
+            <img src="@Model.ImageBase64" alt="@Model.Name" style="max-width: 200px; max-height: 200px;" class="mb-2" />
         }
         else
         {

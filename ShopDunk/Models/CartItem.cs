@@ -14,6 +14,8 @@ namespace ShopDunk.Models
         public int UserID { get; set; }
         public int ProductID { get; set; }
         public int Quantity { get; set; }
+        public string Color { get; set; }
+        public string Storage { get; set; }
 
         [ForeignKey("ProductID")]
         public virtual Product Product { get; set; }

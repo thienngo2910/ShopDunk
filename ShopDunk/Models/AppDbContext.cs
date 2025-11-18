@@ -10,10 +10,9 @@ namespace ShopDunk.Models
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
-
-        // --- THÊM DÒNG NÀY ---
         public DbSet<SliderImage> SliderImages { get; set; }
         public DbSet<ProductReview> ProductReviews { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
 
         public AppDbContext() : base("DefaultConnection") { }
     }

@@ -1,42 +1,31 @@
 ﻿@model ShopDunk.Models.SliderImage
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var existingKeys = (List<string>)ViewBag.ExistingKeys;
-    // ViewBag.Title đã được set trong AdminController
 }
-
-@* <h2>Sửa Slider</h2> *@
 
 @using (Html.BeginForm("EditSlider", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.SliderImageID)
-    @Html.HiddenFor(m => m.ImageUrl)
 
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="mb-3">
         @Html.LabelFor(m => m.CategoryKey)
-        @Html.TextBoxFor(m => m.CategoryKey, new { @class = "form-control", list = "category-keys" })
+
+        @* --- SỬA LỖI: Đổi sang DropDownList --- *@
+        @Html.DropDownListFor(m => m.CategoryKey, (SelectList)ViewBag.CategoryKeyList, "Chọn vị trí hiển thị", new { @class = "form-select" })
+
         @Html.ValidationMessageFor(m => m.CategoryKey, "", new { @class = "text-danger" })
-
-        <datalist id="category-keys">
-            @foreach (var key in existingKeys)
-            {
-                <option value="@key"></option>
-            }
-        </datalist>
-        <small class="form-text text-muted">Nhập 'Home' cho trang chủ, 'iPhone' cho trang iPhone, v.v.</small>
     </div>
-
 
     <div class="mb-3">
         <label>Ảnh hiện tại</label><br />
-        <img src="@Model.ImageUrl" style="max-width: 300px; max-height: 100px; object-fit: cover; border: 1px solid #ddd;" />
+        @* SỬA LỖI: Dùng ImageBase64 *@
+        <img src="@Model.ImageBase64" style="max-width: 300px; max-height: 100px; object-fit: cover; border: 1px solid #ddd;" />
     </div>
 
     <div class="mb-3">
-        @* --- SỬA LỖI: Đổi "ImageFile" thành "ImageFiles" --- *@
         @Html.LabelFor(m => m.ImageFiles, "Tải ảnh mới (để trống nếu không muốn thay đổi)")
         @Html.TextBoxFor(m => m.ImageFiles, new { type = "file", @class = "form-control" })
         @Html.ValidationMessageFor(m => m.ImageFiles, "", new { @class = "text-danger" })

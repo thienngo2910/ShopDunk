@@ -36,19 +36,16 @@
         {
             <tr>
                 <td>
-                    <img src="@item.ImageUrl" alt="@item.Title" style="width: 150px; height: 50px; object-fit: cover;" />
+                    @* --- SỬA LỖI: Đổi ImageUrl thành ImageBase64 --- *@
+                    <img src="@item.ImageBase64" alt="@item.Title" style="width: 150px; height: 50px; object-fit: cover;" />
                 </td>
                 <td class="align-middle"><strong>@item.CategoryKey</strong></td>
                 <td class="align-middle">@item.Title</td>
                 <td class="align-middle">
                     @if (item.IsActive)
-                    {
-                        <span class="badge bg-success">Đang hoạt động</span>
-                    }
+                    {<span class="badge bg-success">Đang hoạt động</span> }
                     else
-                    {
-                        <span class="badge bg-secondary">Đã tắt</span>
-                    }
+                    { <span class="badge bg-secondary">Đã tắt</span>}
                 </td>
                 <td class="align-middle text-end">
                     <a href="@Url.Action("EditSlider", new { id = item.SliderImageID })" class="btn btn-sm btn-outline-primary">Sửa</a>

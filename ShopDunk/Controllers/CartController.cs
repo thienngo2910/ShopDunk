@@ -22,18 +22,32 @@ public class CartController : Controller
         return View(cartItems);
     }
 
-    // GET: /Cart/Add/id
-    public ActionResult Add(int id)
+    // GET: /Cart/Add
+    public ActionResult Add(int id, int? variantId) // Thêm tham số variantId
     {
-        if (Session["UserID"] == null)
-        {
-            TempData["Error"] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.";
-            // --- CẬP NHẬT: Gửi kèm returnUrl (trang trước đó) ---
-            return RedirectToAction("Login", "Account", new { returnUrl = Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Home") });
-        }
+        if (Session["UserID"] == null) return RedirectToAction("Login", "Account");
 
         int userId = (int)Session["UserID"];
-        var item = db.CartItems.FirstOrDefault(c => c.ProductID == id && c.UserID == userId);
+        var product = db.Products.Find(id);
+
+        string color = "Tiêu chuẩn";
+        string storage = "Tiêu chuẩn";
+        decimal price = product.Price;
+
+        // Nếu có chọn biến thể, lấy thông tin chi tiết
+        if (variantId.HasValue)
+        {
+            var variant = db.ProductVariants.Find(variantId);
+            if (variant != null)
+            {
+                color = variant.Color;
+                storage = variant.Storage;
+                price = variant.Price; // Lưu ý: CartItem chưa lưu giá riêng, ta tạm lưu thông tin text
+            }
+        }
+
+        // Logic tìm sản phẩm trong giỏ (Cần so sánh cả Color và Storage)
+        var item = db.CartItems.FirstOrDefault(c => c.ProductID == id && c.UserID == userId && c.Color == color && c.Storage == storage);
 
         if (item != null)
         {
@@ -41,11 +55,18 @@ public class CartController : Controller
         }
         else
         {
-            db.CartItems.Add(new CartItem { ProductID = id, UserID = userId, Quantity = 1 });
+            db.CartItems.Add(new CartItem
+            {
+                ProductID = id,
+                UserID = userId,
+                Quantity = 1,
+                Color = color,      // Lưu màu
+                Storage = storage   // Lưu dung lượng
+            });
         }
 
         db.SaveChanges();
-        TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng.";
+        TempData["Success"] = "Đã thêm vào giỏ hàng.";
         return RedirectToAction("Index", "Cart");
     }
 

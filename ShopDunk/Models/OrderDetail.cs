@@ -15,6 +15,8 @@ namespace ShopDunk.Models
         public int ProductID { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; } // Giá tại thời điểm đặt hàng
+        public string Color { get; set; }
+        public string Storage { get; set; }
 
         // Quan hệ
         [ForeignKey("ProductID")]

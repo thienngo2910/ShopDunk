@@ -1,0 +1,71 @@
+﻿@model ShopDunk.Models.Product
+@{
+    ViewBag.Title = "Quản lý phiên bản: " + Model.Name;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Quản lý phiên bản: <span class="text-warning">@Model.Name</span></h2>
+<a href="@Url.Action("Index")" class="btn btn-secondary mb-3">Quay lại danh sách</a>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Thêm phiên bản mới</h5>
+            @using (Html.BeginForm("AddVariant", "Product", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("ProductID", Model.ProductID)
+
+                <div class="mb-3">
+                    <label>Màu sắc</label>
+                    <input type="text" name="Color" class="form-control" placeholder="VD: Titan Tự nhiên" required />
+                </div>
+                <div class="mb-3">
+                    <label>Dung lượng</label>
+                    <input type="text" name="Storage" class="form-control" placeholder="VD: 256GB" required />
+                </div>
+                <div class="mb-3">
+                    <label>Giá bán</label>
+                    <input type="number" name="Price" class="form-control" value="@Model.Price" required />
+                </div>
+                <div class="mb-3">
+                    <label>Số lượng</label>
+                    <input type="number" name="Stock" class="form-control" value="10" required />
+                </div>
+                <button type="submit" class="btn btn-success w-100">Thêm</button>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Màu</th>
+                    <th>Dung lượng</th>
+                    <th>Giá</th>
+                    <th>Kho</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Variants)
+                {
+                    <tr>
+                        <td>@v.Color</td>
+                        <td>@v.Storage</td>
+                        <td>@v.Price.ToString("N0") ₫</td>
+                        <td>@v.Stock</td>
+                        <td>
+                            @using (Html.BeginForm("DeleteVariant", "Product", new { id = v.VariantID }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-danger">Xóa</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

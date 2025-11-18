@@ -68,7 +68,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.Product.Name</td>
+                            <td>@item.Product.Name - @item.Color - @item.Storage</td>
                             <td>@item.Quantity</td>
                             <td>@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
                         </tr>

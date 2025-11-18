@@ -11,10 +11,19 @@ using System.Diagnostics;
 public class ProductController : Controller
 {
     private AppDbContext db = new AppDbContext();
-
     private const int MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-    [HttpGet] // <-- ĐÃ THÊM
+    // Helper: Chuyển file sang byte[]
+    private byte[] ConvertToBytes(HttpPostedFileBase image)
+    {
+        if (image == null) return null;
+        using (var reader = new BinaryReader(image.InputStream))
+        {
+            return reader.ReadBytes((int)image.ContentLength);
+        }
+    }
+
+    [HttpGet]
     public ActionResult Search(string q)
     {
         var products = new List<Product>();
@@ -27,18 +36,39 @@ public class ProductController : Controller
         return View(products);
     }
 
-    // GET: /Product/Index
-    [HttpGet] // <-- ĐÃ THÊM
-    public ActionResult Index()
+    [HttpGet]
+    public ActionResult Index(string categoryFilter = "all", string sortBy = "name_asc")
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
-        var products = db.Products.ToList();
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+
+        var categories = db.Products
+                           .Select(p => p.Category)
+                           .Where(c => c != null && c != "")
+                           .Distinct()
+                           .ToList();
+        ViewBag.Categories = new SelectList(categories, categoryFilter);
+        ViewBag.CurrentCategory = categoryFilter;
+
+        var productsQuery = db.Products.AsQueryable();
+        if (categoryFilter != "all" && !string.IsNullOrEmpty(categoryFilter))
+        {
+            productsQuery = productsQuery.Where(p => p.Category == categoryFilter);
+        }
+
+        ViewBag.SortBy = sortBy;
+        switch (sortBy)
+        {
+            case "price_desc": productsQuery = productsQuery.OrderByDescending(p => p.Price); break;
+            case "price_asc": productsQuery = productsQuery.OrderBy(p => p.Price); break;
+            case "name_desc": productsQuery = productsQuery.OrderByDescending(p => p.Name); break;
+            default: productsQuery = productsQuery.OrderBy(p => p.Name); break;
+        }
+
+        var products = productsQuery.ToList();
         return View(products);
     }
 
-    // GET: /Product/Details/id
-    [HttpGet] // <-- SỬA LỖI Ở ĐÂY
+    [HttpGet]
     public ActionResult Details(int id)
     {
         var product = db.Products.Find(id);
@@ -72,8 +102,7 @@ public class ProductController : Controller
         return View(product);
     }
 
-    // GET: /Product/Category/id
-    [HttpGet] // <-- ĐÃ THÊM
+    [HttpGet]
     public ActionResult Category(string id, string sortBy = "default")
     {
         var productsQuery = db.Products
@@ -92,12 +121,10 @@ public class ProductController : Controller
         return View(products);
     }
 
-    // GET: /Product/Create
-    [HttpGet] // <-- ĐÃ THÊM
+    [HttpGet]
     public ActionResult Create()
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
         return View();
     }
 
@@ -106,8 +133,14 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Create(Product product)
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+
+        // --- SỬA LỖI: Kiểm tra danh mục ---
+        if (string.IsNullOrEmpty(product.Category))
+        {
+            ModelState.AddModelError("Category", "Vui lòng chọn danh mục.");
+        }
+
         try
         {
             if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
@@ -117,17 +150,8 @@ public class ProductController : Controller
                     ModelState.AddModelError("ImageFile", "Ảnh không được vượt quá 5MB.");
                     return View(product);
                 }
-                string fileName = Path.GetFileName(product.ImageFile.FileName);
-                string extension = Path.GetExtension(fileName);
-                string newFileName = Guid.NewGuid().ToString() + extension;
-                string directoryPath = Server.MapPath("~/Images/Products");
-                if (!Directory.Exists(directoryPath))
-                { Directory.CreateDirectory(directoryPath); }
-                string path = Path.Combine(directoryPath, newFileName);
-                product.ImageFile.SaveAs(path);
-                product.ImageUrl = "/Images/Products/" + newFileName;
+                product.ImageData = ConvertToBytes(product.ImageFile);
             }
-            else { product.ImageUrl = null; }
 
             if (ModelState.IsValid)
             {
@@ -139,29 +163,32 @@ public class ProductController : Controller
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("", "LỖI HỆ THỐNG KHI LƯU FILE: " + ex.Message);
+            ModelState.AddModelError("", "Lỗi: " + ex.Message);
         }
         return View(product);
     }
 
-    // GET: /Product/Edit/id
-    [HttpGet] // <-- ĐÃ THÊM
+    [HttpGet]
     public ActionResult Edit(int id)
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
         var product = db.Products.Find(id);
         if (product == null) return HttpNotFound();
         return View(product);
     }
 
-    // POST: /Product/Edit/id
+    // POST: /Product/Edit
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult Edit(Product product)
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+
+        // --- SỬA LỖI: Kiểm tra danh mục ---
+        if (string.IsNullOrEmpty(product.Category))
+        {
+            ModelState.AddModelError("Category", "Vui lòng chọn danh mục.");
+        }
 
         if (product.ImageFile != null && product.ImageFile.ContentLength > 0)
         {
@@ -171,22 +198,7 @@ public class ProductController : Controller
                 { ModelState.AddModelError("ImageFile", "Ảnh không được vượt quá 5MB."); }
                 else
                 {
-                    var existingProduct = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
-                    if (existingProduct != null && !string.IsNullOrEmpty(existingProduct.ImageUrl))
-                    {
-                        string oldPath = Server.MapPath(existingProduct.ImageUrl);
-                        if (System.IO.File.Exists(oldPath))
-                        { System.IO.File.Delete(oldPath); }
-                    }
-                    string fileName = Path.GetFileName(product.ImageFile.FileName);
-                    string extension = Path.GetExtension(fileName);
-                    string newFileName = Guid.NewGuid().ToString() + extension;
-                    string directoryPath = Server.MapPath("~/Images/Products");
-                    if (!Directory.Exists(directoryPath))
-                    { Directory.CreateDirectory(directoryPath); }
-                    string path = Path.Combine(directoryPath, newFileName);
-                    product.ImageFile.SaveAs(path);
-                    product.ImageUrl = "/Images/Products/" + newFileName;
+                    product.ImageData = ConvertToBytes(product.ImageFile);
                 }
             }
             catch (Exception ex)
@@ -194,8 +206,9 @@ public class ProductController : Controller
         }
         else
         {
-            var existingProduct = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
-            product.ImageUrl = existingProduct?.ImageUrl;
+            // Giữ lại ảnh cũ nếu không upload file mới
+            var oldItem = db.Products.AsNoTracking().FirstOrDefault(p => p.ProductID == product.ProductID);
+            product.ImageData = oldItem?.ImageData;
         }
 
         if (ModelState.IsValid)
@@ -208,48 +221,40 @@ public class ProductController : Controller
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
-            { ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message); }
+            {
+                // Bắt lỗi DB nếu có (ví dụ lỗi NULL Category)
+                ModelState.AddModelError("", "Lỗi khi cập nhật: " + ex.Message);
+            }
         }
 
+        // Fix lỗi mất giá khi validation fail
         if (!ModelState.IsValidField("Price"))
         {
             ModelState.Remove("Price");
-            var originalPrice = db.Products.AsNoTracking()
-                                    .Where(p => p.ProductID == product.ProductID)
-                                    .Select(p => p.Price)
-                                    .FirstOrDefault();
-            product.Price = originalPrice;
+            var oldPrice = db.Products.AsNoTracking().Where(p => p.ProductID == product.ProductID).Select(p => p.Price).FirstOrDefault();
+            product.Price = oldPrice;
         }
+
         return View(product);
     }
 
-    // GET: /Product/Delete/id
-    [HttpGet] // <-- ĐÃ THÊM
+    [HttpGet]
     public ActionResult Delete(int id)
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
         var product = db.Products.Find(id);
         if (product == null) return HttpNotFound();
         return View(product);
     }
 
-    // POST: /Product/Delete/id
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public ActionResult DeleteConfirmed(int id)
     {
-        if (Session["Role"]?.ToString() != "Admin")
-        { return RedirectToAction("AccessDenied", "Account"); }
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
         var product = db.Products.Find(id);
         if (product != null)
         {
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                string imagePath = Server.MapPath(product.ImageUrl);
-                if (System.IO.File.Exists(imagePath))
-                { System.IO.File.Delete(imagePath); }
-            }
             db.Products.Remove(product);
             db.SaveChanges();
             TempData["Success"] = "Xóa sản phẩm thành công!";
@@ -257,46 +262,75 @@ public class ProductController : Controller
         return RedirectToAction("Index");
     }
 
-    // POST: /Product/AddReview
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult AddReview(int ProductID, int Rating, string Comment)
     {
         if (Session["UserID"] == null)
         {
-            TempData["ReviewError"] = "Vui lòng đăng nhập để đánh giá.";
+            TempData["ReviewError"] = "Vui lòng đăng nhập.";
             return RedirectToAction("Details", new { id = ProductID });
         }
 
         int userId = (int)Session["UserID"];
-
-        bool hasReviewed = db.ProductReviews.Any(r => r.ProductID == ProductID && r.UserID == userId);
-        if (hasReviewed)
+        if (!db.ProductReviews.Any(r => r.ProductID == ProductID && r.UserID == userId))
         {
-            TempData["ReviewError"] = "Bạn đã đánh giá sản phẩm này rồi.";
-            return RedirectToAction("Details", new { id = ProductID });
+            db.ProductReviews.Add(new ProductReview { ProductID = ProductID, UserID = userId, Rating = Rating, Comment = Comment, ReviewDate = DateTime.Now });
+            db.SaveChanges();
+            TempData["ReviewSuccess"] = "Đánh giá thành công!";
         }
+        return RedirectToAction("Details", new { id = ProductID });
+    }
+    [HttpGet]
+    public ActionResult ManageVariants(int id)
+    {
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+        var product = db.Products.Include("Variants").FirstOrDefault(p => p.ProductID == id);
+        if (product == null) return HttpNotFound();
+        return View(product);
+    }
 
-        var review = new ProductReview
+    // POST: /Product/AddVariant
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult AddVariant(int ProductID, string Color, string Storage, decimal Price, int Stock)
+    {
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+
+        var variant = new ProductVariant
         {
             ProductID = ProductID,
-            UserID = userId,
-            Rating = Rating,
-            Comment = Comment,
-            ReviewDate = DateTime.Now
+            Color = Color,
+            Storage = Storage,
+            Price = Price,
+            Stock = Stock
         };
-
-        db.ProductReviews.Add(review);
+        db.ProductVariants.Add(variant);
         db.SaveChanges();
+        TempData["Success"] = "Thêm biến thể thành công!";
+        return RedirectToAction("ManageVariants", new { id = ProductID });
+    }
 
-        TempData["ReviewSuccess"] = "Cảm ơn bạn đã đánh giá!";
-        return RedirectToAction("Details", new { id = ProductID });
+    // POST: /Product/DeleteVariant/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult DeleteVariant(int id)
+    {
+        if (Session["Role"]?.ToString() != "Admin") return RedirectToAction("AccessDenied", "Account");
+        var variant = db.ProductVariants.Find(id);
+        int productId = variant.ProductID;
+        if (variant != null)
+        {
+            db.ProductVariants.Remove(variant);
+            db.SaveChanges();
+            TempData["Success"] = "Xóa biến thể thành công!";
+        }
+        return RedirectToAction("ManageVariants", new { id = productId });
     }
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing)
-        { db.Dispose(); }
+        if (disposing) { db.Dispose(); }
         base.Dispose(disposing);
     }
 }
