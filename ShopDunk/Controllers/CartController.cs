@@ -25,7 +25,13 @@ public class CartController : Controller
     // GET: /Cart/Add
     public ActionResult Add(int id, int? variantId) // Thêm tham số variantId
     {
-        if (Session["UserID"] == null) return RedirectToAction("Login", "Account");
+        // --- SỬA LỖI: Gửi kèm returnUrl về trang chi tiết sản phẩm ---
+        if (Session["UserID"] == null)
+        {
+            // Url.Action tạo ra đường dẫn /Product/Details/id, sau đó truyền nó vào Login
+            return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Details", "Product", new { id = id }) });
+        }
+        // --- KẾT THÚC SỬA LỖI ---
 
         int userId = (int)Session["UserID"];
         var product = db.Products.Find(id);

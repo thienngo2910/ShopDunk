@@ -156,9 +156,12 @@ public class ProductController : Controller
             if (ModelState.IsValid)
             {
                 db.Products.Add(product);
-                db.SaveChanges();
-                TempData["Success"] = "Thêm sản phẩm thành công!";
-                return RedirectToAction("Index");
+                db.SaveChanges(); // Lúc này sản phẩm đã có ID
+
+                TempData["Success"] = "Đã tạo sản phẩm! Hãy thêm các phiên bản màu sắc/dung lượng.";
+
+                // --- SỬA ĐỔI: Chuyển thẳng sang trang thêm biến thể ---
+                return RedirectToAction("ManageVariants", new { id = product.ProductID });
             }
         }
         catch (Exception ex)
@@ -266,6 +269,7 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult AddReview(int ProductID, int Rating, string Comment)
     {
+        // Kiểm tra 1: Đã đăng nhập chưa
         if (Session["UserID"] == null)
         {
             TempData["ReviewError"] = "Vui lòng đăng nhập.";
@@ -273,12 +277,44 @@ public class ProductController : Controller
         }
 
         int userId = (int)Session["UserID"];
+
+        // --- KIỂM TRA 2: LOGIC XÁC MINH MUA HÀNG ---
+        // Kiểm tra xem UserID này đã từng có OrderDetail cho ProductID này
+        // VÀ trạng thái của Order phải là "Đã giao"
+        var hasPurchased = db.OrderDetails
+            .Include(od => od.Order) // Liên kết với bảng Order
+            .Any(od =>
+                od.ProductID == ProductID &&
+                od.Order.UserID == userId &&
+                od.Order.Status == "Đã giao"); // Chỉ chấp nhận đơn đã giao
+
+        if (!hasPurchased)
+        {
+            TempData["ReviewError"] = "Xin lỗi, chỉ khách hàng đã mua và nhận sản phẩm này mới được đánh giá.";
+            return RedirectToAction("Details", new { id = ProductID });
+        }
+        // --- KẾT THÚC LOGIC XÁC MINH ---
+
+
+        // KIỂM TRA 3: Chưa đánh giá sản phẩm này lần nào
         if (!db.ProductReviews.Any(r => r.ProductID == ProductID && r.UserID == userId))
         {
-            db.ProductReviews.Add(new ProductReview { ProductID = ProductID, UserID = userId, Rating = Rating, Comment = Comment, ReviewDate = DateTime.Now });
+            db.ProductReviews.Add(new ProductReview
+            {
+                ProductID = ProductID,
+                UserID = userId,
+                Rating = Rating,
+                Comment = Comment,
+                ReviewDate = DateTime.Now
+            });
             db.SaveChanges();
             TempData["ReviewSuccess"] = "Đánh giá thành công!";
         }
+        else
+        {
+            TempData["ReviewError"] = "Bạn đã đánh giá sản phẩm này rồi.";
+        }
+
         return RedirectToAction("Details", new { id = ProductID });
     }
     [HttpGet]

@@ -149,7 +149,31 @@ a {
             color: var(--dark-bg);
             font-weight: 600;
         }
+/* --- GHI ĐÈ MÀU NÚT BẤM TOÀN DIỆN --- */
 
+/* 1. Trạng thái bình thường */
+.btn-outline-primary {
+    color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+
+    /* 2. Trạng thái khi Di chuột (Hover) */
+    .btn-outline-primary:hover {
+        background-color: #ffc107 !important;
+        color: #000 !important; /* Chữ đen cho dễ đọc */
+        border-color: #ffc107 !important;
+    }
+
+    /* 3. Trạng thái khi NHẤN GIỮ (Active/Focus) - Đây là phần sửa lỗi của bạn */
+    .btn-outline-primary:active,
+    .btn-outline-primary.active,
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active:focus {
+        background-color: #ffc107 !important; /* Nền vàng */
+        border-color: #ffc107 !important; /* Viền vàng */
+        color: #000 !important; /* Chữ đen */
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.5) !important; /* Viền phát sáng vàng khi bấm */
+    }
 
 /* 6. Footer (Chân trang) */
 .main-footer {

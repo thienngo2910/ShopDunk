@@ -35,7 +35,7 @@
         @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
     </div>
 
-    <button type="submit" class="btn btn-primary">Đăng ký</button>
+    <button type="submit" class="btn btn-outline-primary rounded-pill w-100">Đăng ký</button>
 
     @Html.Raw(ViewBag.Error != null ? $"<div class=\"text-danger mt-3\">{ViewBag.Error}</div>" : "")
 }

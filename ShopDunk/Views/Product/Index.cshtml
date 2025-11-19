@@ -39,6 +39,9 @@
                     <td class="align-middle">@item.Category</td>
                     <td class="align-middle">
                         <a href="@Url.Action("Edit", new { id = item.ProductID })" class="btn btn-outline-primary btn-sm">Sửa</a>
+                        <a href="@Url.Action("ManageVariants", new { id = item.ProductID })" class="btn btn-outline-warning btn-sm" title="Quản lý biến thể">
+                            <i class="fas fa-layer-group"></i> Biến thể
+                        </a>
                         <a href="@Url.Action("Delete", new { id = item.ProductID })" class="btn btn-outline-danger btn-sm">Xóa</a>
                     </td>
                 </tr>

@@ -5,7 +5,7 @@
     var sliders = (List<ShopDunk.Models.SliderImage>)ViewBag.Sliders;
 }
 
-@* =============== START SLIDER =============== *@
+@* =============== 1. PHẦN SLIDER (BANNER) =============== *@
 @if (sliders != null && sliders.Any())
 {
     <div id="categoryCarousel" class="carousel slide mb-5 shadow-sm" data-bs-ride="carousel" data-bs-interval="3000">
@@ -19,8 +19,7 @@
             @for (int i = 0; i < sliders.Count; i++)
             {
                 <div class="carousel-item @(i == 0 ? "active" : "")">
-                    @* --- SỬA LỖI: Đổi ImageUrl thành ImageBase64 --- *@
-                    <img src="@sliders[i].ImageBase64" class="d-block w-100" alt="@sliders[i].Title">
+                    <img src="@sliders[i].ImageBase64" class="d-block w-100" alt="@sliders[i].Title" style="height: 350px; object-fit: cover;">
                 </div>
             }
         </div>
@@ -35,4 +34,47 @@
     </div>
 }
 
-@* (Phần còn lại: Bộ lọc và Danh sách sản phẩm giữ nguyên) *@
+@* =============== 2. TIÊU ĐỀ & BỘ LỌC =============== *@
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="category-title text-light">@ViewBag.Title</h2>
+
+            <form method="get" class="d-flex align-items-center">
+                @* Giữ nguyên tham số 'id' khi lọc *@
+                @if (ViewBag.CategoryName != null)
+                {
+                    <input type="hidden" name="id" value="@ViewBag.CategoryName" />
+                }
+
+                <label for="sortBy" class="form-label me-2 mb-0 text-muted">Sắp xếp:</label>
+                <select name="sortBy" id="sortBy" class="form-select form-select-sm bg-dark text-light border-secondary" onchange="this.form.submit()">
+                    <option value="default" @(ViewBag.SortBy == "default" ? "selected" : "")>Mới nhất</option>
+                    <option value="price_asc" @(ViewBag.SortBy == "price_asc" ? "selected" : "")>Giá: Thấp đến Cao</option>
+                    <option value="price_desc" @(ViewBag.SortBy == "price_desc" ? "selected" : "")>Giá: Cao đến Thấp</option>
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* =============== 3. DANH SÁCH SẢN PHẨM (PHẦN BỊ THIẾU) =============== *@
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var product in Model)
+        {
+            // Gọi lại Partial View _ProductCard để hiển thị từng ô sản phẩm
+            @Html.Partial("~/Views/Shared/_ProductCard.cshtml", product)
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning text-center" role="alert">
+                <i class="fas fa-box-open fa-2x mb-2"></i><br />
+                Không tìm thấy sản phẩm nào trong danh mục này.
+            </div>
+        </div>
+    }
+</div>

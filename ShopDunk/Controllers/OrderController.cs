@@ -103,13 +103,35 @@ namespace ShopDunk.Controllers
                     ProductID = item.ProductID,
                     Quantity = item.Quantity,
                     UnitPrice = item.Product.Price
+                    // Lưu ý: OrderDetail.Color và .Storage chưa được lưu ở đây, nên cần thêm nếu cần cho lịch sử
                 });
 
-                // Trừ tồn kho
-                item.Product.Stock -= item.Quantity;
-                db.Entry(item.Product).State = EntityState.Modified;
+                // --- LOGIC TRỪ TỒN KHO ĐÃ SỬA ---
+                if (item.Color != "Tiêu chuẩn" || item.Storage != "Tiêu chuẩn")
+                {
+                    // Trường hợp 1: Có biến thể - Trừ tồn kho từ bảng ProductVariant
+                    var variantToUpdate = db.ProductVariants
+                        .FirstOrDefault(v =>
+                            v.ProductID == item.ProductID &&
+                            v.Color == item.Color &&
+                            v.Storage == item.Storage);
+
+                    if (variantToUpdate != null)
+                    {
+                        variantToUpdate.Stock -= item.Quantity;
+                        // Entity Framework sẽ tự theo dõi và cập nhật
+                    }
+                }
+                else
+                {
+                    // Trường hợp 2: Không có biến thể - Trừ tồn kho từ Product gốc
+                    item.Product.Stock -= item.Quantity;
+                    db.Entry(item.Product).State = EntityState.Modified;
+                }
+                // --- KẾT THÚC LOGIC TRỪ TỒN KHO ĐÃ SỬA ---
             }
 
+            // Xóa các sản phẩm đã được thanh toán và lưu tất cả thay đổi (Order, OrderDetail, Stock)
             db.CartItems.RemoveRange(cartItems);
             db.SaveChanges();
 

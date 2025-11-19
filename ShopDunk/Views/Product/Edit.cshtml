@@ -57,6 +57,15 @@
             <p class="text-muted">Chưa có ảnh</p>
         }
     </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        
+        <a href="@Url.Action("ManageVariants", "Product", new { id = Model.ProductID })" class="btn btn-warning text-dark">
+            <i class="fas fa-layer-group"></i> Quản lý Màu/Dung lượng
+        </a>
+        <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Hủy</a>
+    </div>
+
 
     <div class="form-group mb-3">
         @Html.LabelFor(m => m.ImageFile, "Thay đổi ảnh (không bắt buộc)")
