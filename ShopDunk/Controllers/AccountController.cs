@@ -97,10 +97,15 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
-    public ActionResult AccessDenied() => View();
+    // GET: /Account/AccessDenied
+    [HttpGet]
+    public ActionResult AccessDenied(string returnUrl) // <--- Thêm tham số này
+    {
+        ViewBag.ReturnUrl = returnUrl; // Lưu lại để dùng ở View
+        return View();
+    }
 
-    [HttpGet] // (Thêm [HttpGet] cho rõ ràng)
+    [HttpGet]
     public ActionResult ChangePassword()
     {
         if (Session["UserID"] == null)

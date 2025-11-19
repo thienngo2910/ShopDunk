@@ -1,64 +1,292 @@
-﻿@{
-    ViewBag.Title = "Dashboard";
+﻿@model IEnumerable<ShopDunk.Models.Order>
+@{
+    ViewBag.Title = "Trung tâm điều khiển";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var newMembers = ViewBag.NewMembers as List<ShopDunk.Models.User>;
 }
 
-@* --- SỬA LỖI: Xóa khối div tiêu đề lặp lại --- *@
-@*
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Dashboard</h1>
-    </div>
-*@
+<style>
+    /* --- KPI CARDS STYLING (FLAT STYLE) --- */
+    .kpi-card {
+        background: linear-gradient(145deg, #1C1C1E, #161618);
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, border-color 0.3s ease;
+        height: 100%;
+    }
 
-<div class="row g-3">
-    <div class="col-md-6 col-lg-3">
-        <div class="card p-3 shadow-sm" style="border-left: 5px solid #198754;">
-            <div class="d-flex justify-content-between">
-                <div class="card-info">
-                    <h6 class="text-secondary text-uppercase">Tổng Doanh thu</h6>
-                    <h3 class="fw-bold">@ViewBag.TotalRevenue.ToString("N0") ₫</h3>
+    /* Hiệu ứng hover: Nổi lên nhẹ, đổi màu viền, KHÔNG CÓ NEON */
+    a:hover .kpi-card {
+        transform: translateY(-5px);
+        border-color: var(--accent-gold);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Bóng đổ đen tự nhiên */
+    }
+
+    .kpi-title {
+        color: #86868b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0;
+    }
+
+    /* --- ICON PHẲNG (KHÔNG PHÁT SÁNG) --- */
+    .kpi-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2.5rem;
+        opacity: 0.5; /* Độ đậm vừa phải */
+        transition: all 0.3s ease;
+        /* Đã bỏ filter: drop-shadow (Neon) */
+    }
+
+    /* Khi di chuột vào thì icon đậm lên và phóng to nhẹ */
+    a:hover .kpi-card .kpi-icon {
+        opacity: 1 !important;
+        transform: scale(1.1);
+    }
+    /* ----------------------------------------- */
+
+    /* --- TIMELINE STYLING --- */
+    .activity-timeline {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+    }
+
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 15px;
+            width: 2px;
+            background-color: #333;
+        }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 45px;
+        padding-bottom: 25px;
+    }
+
+    .timeline-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--dark-card);
+        border: 2px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        color: var(--accent-gold);
+        font-size: 0.8rem;
+    }
+
+    /* --- TABLE STYLING --- */
+    .table-custom th {
+        border-bottom: 1px solid #444;
+        color: #888;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .table-custom td {
+        border-bottom: 1px solid #333;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    /* Hiệu ứng dòng bấm được */
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .clickable-row:hover {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        background-color: #333;
+        color: #ccc;
+    }
+</style>
+
+<div class="container-fluid px-0">
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-3 col-md-6">
+            <a href="@Url.Action("Index", "Admin")" class="text-decoration-none">
+                <div class="kpi-card">
+                    <div class="kpi-title">Tổng doanh thu</div>
+                    <div class="kpi-value" style="color: #F0B90B;">@(((decimal)ViewBag.TotalRevenue).ToString("#,##0,,.0")) M</div>
+                    <div class="kpi-icon" style="color: #F0B90B;"><i class="fas fa-coins"></i></div>
                 </div>
-                <div class="card-icon fs-2 text-success">
-                    <i class="fas fa-dollar-sign"></i>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="@Url.Action("Orders", "Admin", new { statusFilter = "Chờ xử lý" })" class="text-decoration-none">
+                <div class="kpi-card">
+                    <div class="kpi-title">Đơn hàng mới</div>
+                    <div class="kpi-value">@ViewBag.PendingOrders</div>
+                    <div class="kpi-icon" style="color: #0d6efd;"><i class="fas fa-shopping-bag"></i></div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="@Url.Action("Index", "Product")" class="text-decoration-none">
+                <div class="kpi-card">
+                    <div class="kpi-title">Tổng sản phẩm</div>
+                    <div class="kpi-value">@ViewBag.TotalProducts</div>
+                    <div class="kpi-icon" style="color: #198754;"><i class="fas fa-box-open"></i></div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="@Url.Action("Users", "Admin")" class="text-decoration-none">
+                <div class="kpi-card">
+                    <div class="kpi-title">Tổng thành viên</div>
+                    <div class="kpi-value">@ViewBag.TotalUsers</div>
+                    <div class="kpi-icon" style="color: #dc3545;"><i class="fas fa-users"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+            <div class="card h-100 border-0" style="background-color: var(--dark-card); border-radius: 12px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="text-light fw-bold mb-0">Đơn hàng gần đây</h5>
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-sm btn-outline-secondary rounded-pill">Xem tất cả</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0 table-custom" style="--bs-table-bg: transparent;">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Mã đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày đặt</th>
+                                    <th class="text-end pe-4"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        <tr class="clickable-row" onclick="window.location.href='@Url.Action("OrderDetails", new { id = item.OrderID })'">
+                                            <td class="ps-4 fw-bold text-light">#@item.OrderID</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-2"><i class="fas fa-user"></i></div>
+                                                    <span class="text-light">@item.User.Username</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-warning fw-bold">@item.TotalAmount.ToString("N0") ₫</td>
+                                            <td>
+                                                @if (item.Status == "Chờ xử lý")
+                                                {<span class="badge bg-warning text-dark rounded-pill px-3">Chờ xử lý</span> }
+                                                else if (item.Status == "Đang giao")
+                                                { <span class="badge bg-info text-dark rounded-pill px-3">Đang giao</span> }
+                                                else if (item.Status == "Đã giao")
+                                                { <span class="badge bg-success rounded-pill px-3">Đã giao</span> }
+                                                else if (item.Status == "Đã hủy")
+                                                { <span class="badge bg-danger rounded-pill px-3">Đã hủy</span> }
+                                                else
+                                                { <span class="badge bg-secondary rounded-pill px-3">@item.Status</span>}
+                                            </td>
+                                            <td class="text-muted">@item.OrderDate.ToString("dd/MM HH:mm")</td>
+                                            <td class="text-end pe-4">
+                                                <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="6" class="text-center text-muted py-5">Chưa có đơn hàng nào.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card p-3 shadow-sm" style="border-left: 5px solid #ffc107;">
-            <div class="d-flex justify-content-between">
-                <div class="card-info">
-                    <h6 class="text-secondary text-uppercase">Đơn chờ xử lý</h6>
-                    <h3 class="fw-bold">@ViewBag.PendingOrders</h3>
+
+        <div class="col-lg-4">
+            <div class="card h-100 border-0" style="background-color: var(--dark-card); border-radius: 12px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 mb-2">
+                    <h5 class="text-light fw-bold mb-0">Nhật ký hoạt động</h5>
                 </div>
-                <div class="card-icon fs-2 text-warning">
-                    <i class="fas fa-clock"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card p-3 shadow-sm" style="border-left: 5px solid #0d6efd;">
-            <div class="d-flex justify-content-between">
-                <div class="card-info">
-                    <h6 class="text-secondary text-uppercase">Tổng Sản phẩm</h6>
-                    <h3 class="fw-bold">@ViewBag.TotalProducts</h3>
-                </div>
-                <div class="card-icon fs-2 text-primary">
-                    <i class="fas fa-box-open"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card p-3 shadow-sm" style="border-left: 5px solid #0dcaf0;">
-            <div class="d-flex justify-content-between">
-                <div class="card-info">
-                    <h6 class="text-secondary text-uppercase">Người dùng</h6>
-                    <h3 class="fw-bold">@ViewBag.TotalUsers</h3>
-                </div>
-                <div class="card-icon fs-2 text-info">
-                    <i class="fas fa-users"></i>
+                <div class="card-body p-4 pt-0" style="max-height: 500px; overflow-y: auto;">
+                    <ul class="activity-timeline">
+                        @foreach (var order in Model.Take(4))
+                        {
+                            <li class="timeline-item">
+                                <div class="timeline-icon"><i class="fas fa-receipt"></i></div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="fw-bold text-light">Đơn hàng mới #@order.OrderID</span>
+                                    <span class="text-warning font-monospace small">@order.TotalAmount.ToString("#,##0")</span>
+                                </div>
+                                <div class="text-muted small mb-1">
+                                    Khách hàng <strong>@order.User.Username</strong> đã đặt hàng thành công.
+                                </div>
+                                <small class="text-secondary"><i class="far fa-clock me-1"></i> @order.OrderDate.ToString("dd/MM lúc HH:mm")</small>
+                            </li>
+                        }
+
+                        @if (newMembers != null)
+                        {
+                            foreach (var user in newMembers)
+                            {
+                                <li class="timeline-item">
+                                    <div class="timeline-icon" style="border-color: #dc3545; color: #dc3545;"><i class="fas fa-user-plus"></i></div>
+                                    <div class="mb-1">
+                                        <span class="fw-bold text-light">Thành viên mới</span>
+                                    </div>
+                                    <div class="text-muted small mb-1">
+                                        <strong>@user.Username</strong> vừa đăng ký tài khoản.
+                                    </div>
+                                    <small class="text-secondary"><i class="fas fa-shield-alt me-1"></i> @user.Role</small>
+                                </li>
+                            }
+                        }
+                    </ul>
                 </div>
             </div>
         </div>

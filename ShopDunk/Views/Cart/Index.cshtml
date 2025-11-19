@@ -1,50 +1,123 @@
 ﻿@model IEnumerable<ShopDunk.Models.CartItem>
-
 @{
     ViewBag.Title = "Giỏ hàng";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    decimal total = 0;
 }
 
-<h2>Giỏ hàng của bạn</h2>
+<div class="container my-5">
+    <h2 class="mb-4 fw-bold text-light">Giỏ hàng của bạn</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Sản phẩm</th>
-            <th>Số lượng</th>
-            <th>Giá</th>
-            <th>Thành tiền</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5 rounded" style="background-color: var(--dark-card);">
+            <i class="fa-solid fa-cart-arrow-down fa-3x text-muted mb-3"></i>
+            <p class="fs-5 text-light">Giỏ hàng đang trống!</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-2 rounded-pill">Tiếp tục mua sắm</a>
+        </div>
+    }
+    else
+    {
+        using (Html.BeginForm("Checkout", "Order", FormMethod.Get))
         {
-            <tr>
-                <td class="align-middle">@item.Product.Name - @item.Color - @item.Storage</td>
-
-                @* --- BẮT ĐẦU CẬP NHẬT SỐ LƯỢNG --- *@
-                <td class="align-middle">
-                    <div class="input-group" style="width: 130px;">
-                        <a href="@Url.Action("DecreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary btn-sm">-</a>
-                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly />
-                        <a href="@Url.Action("IncreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary btn-sm">+</a>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="table-responsive" style="border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+                        <table class="table align-middle table-dark table-borderless" style="background-color: var(--dark-card); margin-bottom: 0;">
+                            <thead class="text-muted" style="border-bottom: 1px solid var(--border-color);">
+                                <tr>
+                                    <th>Chọn</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    total += item.Product.Price * item.Quantity;
+                                    <tr style="border-bottom: 1px solid var(--border-color);">
+                                        <td>
+                                            <input type="checkbox" name="selectedCartItems" value="@item.CartItemID"
+                                                   class="form-check-input item-checkbox" checked onchange="updateTotal()"
+                                                   data-subtotal="@(item.Product.Price * item.Quantity)">
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.Product.ImageBase64" alt="@item.Product.Name" style="width: 60px; height: 60px; object-fit: contain;" class="me-3 border rounded p-1">
+                                                <div>
+                                                    <h6 class="mb-0"><a href="@Url.Action("Details", "Product", new { id = item.ProductID })" class="text-decoration-none text-light">@item.Product.Name - @item.Color - @item.Storage</a></h6>
+                                                    <small class="text-muted"></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-light">@item.Product.Price.ToString("N0") ₫</td>
+                                        <td>
+                                            <div class="input-group input-group-sm" style="width: 100px;">
+                                                <a href="@Url.Action("DecreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary border-0">-</a>
+                                                <input type="text" class="form-control text-center bg-transparent text-light border-0" value="@item.Quantity" readonly>
+                                                <a href="@Url.Action("IncreaseQuantity", "Cart", new { id = item.CartItemID })" class="btn btn-outline-secondary border-0">+</a>
+                                            </div>
+                                        </td>
+                                        <td class="fw-bold" style="color: var(--accent-gold);">@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
+                                        <td>
+                                            <a href="@Url.Action("Remove", "Cart", new { id = item.CartItemID })" class="btn btn-sm btn-danger rounded-pill">
+                                                Xóa
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                </td>
-                @* --- KẾT THÚC CẬP NHẬT SỐ LƯỢNG --- *@
+                </div>
 
-                <td class="align-middle">@((item.Product.Price).ToString("N0")) ₫</td>
-
-                <td class="align-middle">@((item.Product.Price * item.Quantity).ToString("N0")) ₫</td>
-
-                <td class="align-middle">
-                    <a href="/Cart/Remove/@item.CartItemID" class="btn btn-danger btn-sm">Xóa</a>
-                </td>
-            </tr>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm" style="background-color: var(--dark-card);">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4 fw-bold text-light">Cộng giỏ hàng</h5>
+                            <div class="d-flex justify-content-between mb-3 text-light">
+                                <span>Tổng tiền các mặt hàng:</span>
+                                <span class="fw-bold" id="totalAmountDisplay">@total.ToString("N0") ₫</span>
+                            </div>
+                            <hr style="border-color: var(--border-color);">
+                            <div class="d-flex justify-content-between mb-4 text-light">
+                                <span class="fs-5 fw-bold">Tổng cộng:</span>
+                                <span class="fs-5 fw-bold" style="color: var(--accent-gold);" id="finalTotalDisplay">@total.ToString("N0") ₫</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary rounded-pill py-2">Tiến hành thanh toán</button>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary py-2 rounded-pill">Mua thêm sản phẩm khác</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    }
+</div>
 
-<a href="@Url.Action("Checkout", "Order")" class="btn btn-outline-primary rounded-pill py-2 w-100">
-    Tiến hành thanh toán
-</a>
+<script>
+    function formatCurrency(number) {
+        return number.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '').trim() + ' ₫';
+    }
+
+    function updateTotal() {
+        let currentTotal = 0;
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const subtotal = parseFloat(checkbox.dataset.subtotal);
+                currentTotal += subtotal;
+            }
+        });
+
+        document.getElementById('totalAmountDisplay').innerText = formatCurrency(currentTotal);
+        document.getElementById('finalTotalDisplay').innerText = formatCurrency(currentTotal);
+    }
+
+    document.addEventListener('DOMContentLoaded', updateTotal);
+</script>

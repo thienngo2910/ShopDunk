@@ -46,15 +46,34 @@ public class AdminController : Controller
     // ------------------------------------------------------
 
     // Trang chủ Admin (Dashboard)
+    // GET: Admin/Index
     public ActionResult Index()
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Account");
+
+        // 1. Thống kê tổng quan
         ViewBag.TotalUsers = db.Users.Count();
         ViewBag.TotalProducts = db.Products.Count();
         ViewBag.TotalOrders = db.Orders.Count();
-        ViewBag.TotalRevenue = db.Orders.Where(o => o.Status == "Đã giao").Sum(o => (decimal?)o.TotalAmount) ?? 0;
+        decimal totalRevenue = db.Orders.Where(o => o.Status == "Đã giao").Sum(o => (decimal?)o.TotalAmount) ?? 0;
+        ViewBag.TotalRevenue = totalRevenue;
         ViewBag.PendingOrders = db.Orders.Count(o => o.Status == "Chờ xử lý");
-        return View();
+
+        // 2. Lấy 5 đơn hàng mới nhất
+        var recentOrders = db.Orders
+                             .Include(o => o.User)
+                             .OrderByDescending(o => o.OrderDate)
+                             .Take(5)
+                             .ToList();
+
+        // 3. Lấy danh sách sản phẩm sắp hết hàng (Stock < 10) - MỚI
+        ViewBag.LowStockProducts = db.Products
+                                     .Where(p => p.Stock < 10)
+                                     .OrderBy(p => p.Stock)
+                                     .Take(5)
+                                     .ToList();
+
+        return View(recentOrders);
     }
 
     public ActionResult Products()

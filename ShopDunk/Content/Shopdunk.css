@@ -409,3 +409,17 @@ form.d-flex .form-label {
         .star-rating-input input:checked ~ label {
             color: var(--accent-gold);
         }
+.form-check-input:checked {
+    /* 1. Nền chuyển sang màu vàng chủ đạo */
+    background-color: var(--accent-gold);
+    /* 2. Viền phải cùng màu với nền */
+    border-color: var(--accent-gold);
+    /* 3. Đảm bảo tick mark vẫn là màu trắng */
+    /* Background-image (tick mark) sẽ tự chuyển sang trắng khi nền sáng */
+}
+
+/* Đảm bảo bóng mờ (Focus ring) cũng là màu vàng */
+.form-check-input:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 0.25rem rgba(240, 185, 11, 0.25); /* Gold Shadow */
+}
